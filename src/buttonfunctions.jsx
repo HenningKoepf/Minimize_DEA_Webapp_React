@@ -3,15 +3,16 @@ import React from 'react';
 
 const NewNodeButton = () => {
     return (
-        <>
-
+    <>
     <button onClick={newNodeButtonClickHandler}>
         I'm a button for future use!
     </button>
     <button onRightClick ={contextNodeButtonClickHandler}>
 
     </button>
-        </>
+    </>
+
+
 );
 };
 // MyButton.js
