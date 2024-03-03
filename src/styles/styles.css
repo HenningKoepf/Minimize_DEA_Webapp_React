@@ -1,0 +1,327 @@
+.App {
+  display: flex; /* Verwenden Sie Flexbox, um den Inhalt anzuordnen */
+  justify-content: space-between; /* Platzieren Sie den Inhalt am linken und rechten Rand */
+}
+.alphabet {
+  display: block;
+font-weight: bold;
+}
+
+.context-menu {
+  background: white;
+  border-style: solid;
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
+  position: absolute;
+  z-index: 10;
+}
+
+.context-menu button {
+  border: none;
+  display: block;
+  padding: 0.5em;
+  text-align: left;
+  width: 100%;
+}
+
+.context-menu button:hover {
+  background: white;
+}
+.react-flow__basenode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+}
+
+.react-flow__node {
+  height:50px;
+  width: 50px;
+  font-size: 8px;
+  background: #eee;
+  border: 1px solid #555;
+  /*
+
+  border-radius: 5px;
+   */
+  border-radius: 50%;
+  text-align: center;
+  justify-content: center;
+  /*
+  line-height: 25px;
+   */
+}
+/*
+Dicker Rand für Endzustand
+ */
+/* Regel für Nodes mit zwei Rahmenlinien */
+.react-flow__node[className = outputNode] {
+  background: lightgreen; /* Hintergrundfarbe anpassen */
+  font-weight: bold; /* Schriftart anpassen */
+  position: relative; /* Position relativ setzen */
+  border-radius: 50%;
+}
+
+/* Erste Rahmenlinie */
+.react-flow__node[data-output= true]::before {
+  content: '';
+  position: absolute;
+  top: -2px; /* Abstand von oben */
+  left: -2px; /* Abstand von links */
+  right: -2px; /* Abstand von rechts */
+  bottom: -2px; /* Abstand von unten */
+  border: 1px solid black; /* Erste Rahmenlinie */
+  border-radius: 50%;
+}
+/* Zweite Rahmenlinie */
+.react-flow__node[data-output= true]::after {
+  content: '';
+  position: absolute;
+  top: -5px; /* Abstand von oben */
+  left: -5px; /* Abstand von links */
+  right: -5px; /* Abstand von rechts */
+  bottom: -5px; /* Abstand von unten */
+  border: 1px solid black; /* Zweite Rahmenlinie */
+  border-radius: 50%;
+  z-index: -1; /* Hinter die erste Rahmenlinie legen */
+}
+
+.react-flow__node[data-input= true] {
+  border: 2px solid black;
+  background: lightgreen;
+}
+
+/* Regel für den Pfeil am Knoten mit ID "input" */
+
+.react-flow__node[data-input= true]::before {
+  content: ''; /* Leerer Inhalt */
+  position: absolute; /* Absolute Positionierung relativ zum Elternelement */
+  top: 50%; /* Vertikale Ausrichtung auf 50% des Knotens */
+  left: -10px; /* Horizontaler Abstand zum Knoten */
+  border: solid transparent; /* Transparenter Rand */
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%); /* Vertikale Ausrichtung zentrieren */
+}
+.react-flow__node[data-input= true]::after {
+  content: ''; /* Leerer Inhalt */
+  position: absolute; /* Absolute Positionierung relativ zum Elternelement */
+  top: 50%; /* Vertikale Ausrichtung auf 50% des Knotens */
+  left: -10px; /* Horizontaler Abstand zum Knoten */
+  border-radius: 50%;
+  border: 5px solid transparent;
+  border-left-color: #555;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+}
+
+
+
+.react-flow{
+  height: 80vh !important;
+  width: 100%;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+}
+
+.node {
+  height: 50px;
+  width: 50px;
+  border-radius: 10%;
+
+}
+.react-flow__panel.react-flow__attribution.bottom.right {
+  display: none;
+}
+
+
+.toptext {
+  font-size: 32px;
+  font-family: "Apple Braille", serif;
+  text-align: center;
+}
+
+.Kontrollcontainer{
+  border: 1px solid lightgray;
+  height: 100vh;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column; /* Anordnung der Inhalte in Spalten */
+  align-items: flex-start; /* Horizontale Ausrichtung */
+  justify-content: flex-start; /* Vertikale Ausrichtung */
+}
+.Kontrollcontainer label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.Kontrollcontainer input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.Kontrollcontainer .alphabet {
+  font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
+  margin-top: 5px;
+}
+.Kontrollcontainer .zustände {
+  font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.Kontrollcontainer button {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px; /* Abstand zum vorherigen Element */
+}
+
+.Kontrollcontainer .DFAAnzeige {
+  margin-top: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 5px;
+  border: none;
+}
+
+.Kontrollcontainer .DFAAnzeige.true {
+  background-color: #28a745; /* Grün für "Ja" */
+  color: black;
+}
+
+.Kontrollcontainer .DFAAnzeige.false {
+  background-color: #dc3545; /* Rot für "Nein" */
+  color: black;
+}
+
+
+.DFAContainer {
+  display: flex;
+  align-items: center; /* Zentriert die Inhalte vertikal */
+}
+
+
+/* Stil für True */
+.DFAAnzeige.true {
+  color: green;
+}
+
+/* Stil für False */
+.DFAAnzeige.false {
+  color: red;
+}
+
+/*
+Anzeige der bisherigen Partitionen scrollbar
+ */
+.partition-history {
+  list-style-type: none;
+  margin-top: 0;
+  padding-top: 10px;
+  overflow-y: auto;
+  max-height: 200px;
+  width: 95%;
+  margin-left: 5px;
+}
+
+.history-entry + .history-entry {
+  margin-top: 5px; /* Reduzieren Sie den Abstand zwischen den Einträgen */
+}
+
+/* NodeLabelList *//* NodeLabelList.css */
+.nodeList {
+
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  max-height: 200px;
+  width: 95%;
+}
+
+.nodeItem {
+  font-weight: bold;
+  margin-bottom: 10px; /* Reduzierter Abstand */
+  padding: 5px; /* Reduzierter Padding */
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  font-size: 14px; /* Kleinere Schriftgröße */
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+.edgeList {
+  list-style-type: none;
+  padding-left: 20px; /* Geringerer Einzug */
+  margin-top: 5px; /* Reduzierter Abstand */
+}
+
+.edgeItem {
+  background-color: #e0e0e0;
+  margin-bottom: 3px; /* Reduzierter Abstand */
+  padding-left: 10px; /* Reduzierter Padding */
+  border-radius: 3px;
+  margin-left: 20px;
+  font-size: 12px; /* Kleinere Schriftgröße */
+  width: 50%;
+}
+
+.header {
+  font-size: 18px; /* Kleinere Schriftgröße */
+  color: #333;
+  margin-bottom: 5px; /* Reduzierter Abstand */
+}
+
+.subHeader {
+  font-size: 14px; /* Kleinere Schriftgröße */
+  color: #666;
+  margin-top: 5px;
+  margin-bottom: 2px; /* Reduzierter Abstand */
+}
+
+.partition-history {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-entry {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.partition-row {
+  display: flex;
+}
+
+.partition {
+  padding: 0 10px; /* Anpassen für Abstand zwischen Partitionen */
+  border-right: 1px solid black; /* Linie zwischen Partitionen */
+}
+
+.partition:last-child {
+  border-right: none;
+}
+
+.symbol {
+  padding-left: 10px; /* Abstand zwischen Partitionen und Symbol */
+  white-space: nowrap; /* Verhindert Zeilenumbruch bei Symbolen */
+}
+
+.step-number {
+  padding-right: 10px; /* Abstand vor der Schritt-Nummer */
+}

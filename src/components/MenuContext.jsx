@@ -34,7 +34,7 @@ const MenuContext = ({ data }) => {
             {clicked && (
                 <ContextMenu top={points.y} left={points.x}>
                     <ul>
-                        <li> Edit</li>
+                        <li>Edit</li>
                         <li>Copy</li>
                         <li>Delete</li>
                     </ul>

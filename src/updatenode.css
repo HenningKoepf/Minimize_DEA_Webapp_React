@@ -1,9 +1,9 @@
 .updatenode__controls {
     position: absolute;
     right: 10px;
-    top: 10px;
+    left: 10px;
     z-index: 4;
-    font-size: 12px;
+    font-size: 4px;
 }
 
 .updatenode__controls label {
@@ -18,4 +18,11 @@
     margin-top: 10px;
     display: flex;
     align-items: center;
+}
+.basenode {
+    display: flex;
+    align-items: center; /* Zentriert vertikal */
+    justify-content: center; /* Zentriert horizontal */
+    width: 100%;
+    height: 100%;
 }

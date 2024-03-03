@@ -27,7 +27,7 @@ export const newNodeButtonClickHandler = () => {
  //   alert("Das wird ein gutes Produkt!");
 
     const aNumber = Number(window.prompt("Userinput einer Zahl:", "0"));
-    if (aNumber != 0){
+    if (aNumber !== 0){
         alert("Du hast " + aNumber + " als deine Zahl gewählt!");
         console.log("No error occurred while loading the ButtonclickHandlerinput, it was: " + aNumber);
     }else{
