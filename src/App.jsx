@@ -21,10 +21,12 @@ import SelfConnectingEdge from './elements/SelfConnectingEdge';
 import BaseNode from './elements/BaseNode';
 
 //import { initialNodes, initialEdges } from './elements/initial-setup';
-import { initialNodes, initialEdges } from './elements/initial-setup2';
+import {initialNodes, initialEdges} from './elements/initial-setup2';
+import {initialNode, noEdges} from './elements/ClearBoard';
+import {exampleNodes, exampleEdges} from './elements/exampleDFA';
 import Partitioner from './components/Partitioner';
 import {findPartitionForState, findTargetState} from './components/Partitioner';
-import { data } from "./data/data";
+//import {data } from "./data/data";
 import NodeLabelList from './components/NodeLabelList';
 
 const EdgeTypes = {
@@ -51,13 +53,17 @@ function App() {
 
     const [alphabet, setAlphabet] = useState(['a', 'b', 'c']);
 
-
+    const plainField = () => {
+        setNodes(exampleNodes);
+        setEdges(exampleEdges);
+    }
 
     const initialPartition = (nodes) => {
         const endStates = nodes.filter(node => node.data.output);
         const nonEndStates = nodes.filter(node => !node.data.output);
         return [nonEndStates, endStates];
     };
+
     const [partitions, setPartitions] = useState(initialPartition(nodes));
     const [partitionsHistory, setPartitionsHistory] = useState([]);
 
@@ -242,7 +248,7 @@ function App() {
         const startStateId = startStates[0].id; //Breitensuche aufsetzpunkt
         const transitions = new Map();
 
-        // Initialisieren der Transitions Map mit leeren Sets
+        // Initialisieren der  Map mit den Übergängen leeren Sets
         nodes.forEach(node => {
             alphabet.forEach(symbol => {
                 const key = `${node.id}-${symbol}`;
@@ -438,13 +444,7 @@ function App() {
 
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
 
-                  <button onClick={resetPage}> Reset </button>
-                  <div className="DFAContainer">
-                  <button onClick={checkIsDFA}>Ist das ein DFA?</button>
-                  <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
-                      {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
-                  </div>
-              </div>
+
                   <legend><strong>Eingabe: </strong></legend>
                   <div>
                       <label>Alphabet bearbeiten:</label>
@@ -462,6 +462,16 @@ function App() {
                           </div>
 
                       <NodeLabelList nodes={nodes} edges = {edges}/>
+                  <div>
+                  <button onClick={resetPage} style={{ marginRight: '20px' }}> Reload</button>
+                      <button onClick={plainField}> Beispiel </button>
+              </div>
+                  <div className="DFAContainer">
+                      <button onClick={checkIsDFA}>Ist das ein DFA?</button>
+                      <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
+                          {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
+                      </div>
+                  </div>
 
                       <Partitioner
                           isDfaResult={isDfaResult}

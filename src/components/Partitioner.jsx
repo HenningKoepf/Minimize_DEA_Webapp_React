@@ -62,77 +62,6 @@ const formatPartitions = (partitions) => {
  * @returns {[*,*]}
  */
 
-/*
-
-function refinePartitions(nodes, edges, alphabet, partitions, setPartitions) {
-    // Initialisiere Partitionen mit Endzuständen und Nicht-Endzuständen
-    //let partitions = initialPartition(nodes);
-
-    let changed = true;
-    while (changed) {
-        //erst wenn sich noch etwas verändert hat,changed => true, wird weitergearbeitet.
-        changed = false;
-        //initalisieurng für diese Schleife
-        let newPartitions = [];
-
-        //For-Schleife über alle Partitionen
-        partitions.forEach(partition => {
-            let partitionMap = new Map();
-            //For-Schleife über alle Knoten dieser Partition
-            partition.forEach(node => {
-                // Sammle alle Übergänge für die aktuelle Node
-                let symbolsForNode = new Set();
-                //For- Schleife für alle Kanten dieses Knotens
-                edges.forEach(edge => {
-                    if (edge.source === node.id) {
-                        edge.label.split(/[\s,;]+/).forEach(symbol => symbolsForNode.add(symbol));
-                    }
-                });
-                console.log("Node ID: " + node.id + " mit Label: " + node.data.label);
-                console.log(symbolsForNode);
-
-                //For-Schleife für alle Übergangssymbole dieser Kante
-                symbolsForNode.forEach(symbol => {
-
-                    const target = findTargetState(node, symbol, edges);
-                    console.log('Knoten ' + node.data.label + ' mit Übergang: ' + symbol + "zu: " + target );
-                    const targetPartition = findPartitionForState(target, partitions);
-                    const partitionKey = targetPartition
-                        ? targetPartition.map(n => n.label).sort().join(',')
-                        : 'Müllzustand';
-
-                    if (!partitionMap.has(partitionKey)) {
-                        partitionMap.set(partitionKey, new Set ());
-                    }
-                    //evtl direkt bei den nodes partitionieren, benefit für späteres ansteuern bei GUI
-                    partitionMap.get(partitionKey).add(node);
-                });
-            });
-
-            partitionMap.forEach(subPartition => {
-                newPartitions.push(subPartition);
-            });
-        });
-        //Vorherige größe der Partitionen speichern
-        const prevPartitionsLength = partitions.length;
-        console.log(partitions);
-        console.log(newPartitions);
-        setPartitions(newPartitions);
-        // Überprüfen, ob sich die Anzahl der Partitionen geändert hat
-
-            console.log("Else bereich hat changed auf: ")
-            // Zusätzlich überprüfen, ob die Inhalte der Partitionen sich geändert haben
-            changed = partitions.every((partition, index) => {
-                return partition.length === newPartitions[index].length &&
-                    partition.every((node, nodeIndex) => { return node === newPartitions[index][nodeIndex];
-                });
-            });
-            console.log(changed + " gesetz.")
-
-    }
-    return partitions;
-}
- */
 function refinePartitions(partitions, edges, symbol) {
     let newPartitions = [];
 
@@ -190,22 +119,22 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
 
 
                 for (const symbol of alphabet) {
-                    // Warten Sie, bis die refinePartitions-Funktion die Partitionen für das aktuelle Symbol verfeinert hat
+                    //auf die neuen Partitions warten damit wir die schleife nicht übel oft durchlaufen müssen
                     const refinedPartitions = await refinePartitions(currentPartitions, edges, symbol);
                     //Historylogg
                     history.push({symbol: symbol, partitions: refinedPartitions});
-                    // Setzen Sie die Partitionen auf die verfeinerten Partitionen für das nächste Symbol
+                    // für nöchstes zeichen
 
                     currentPartitions = refinedPartitions;
                 }
-                // Aktualisieren Sie die Partitionen im Zustand nur einmal, nachdem alle Verfeinerungen abgeschlossen sind
+
                 setPartitions(currentPartitions);
                 setPartitionsHistory(history);
-                console.log(history);
+                //console.log(history);
             };
 
             refineAllPartitions().catch(console.error);
-            setTriggerCalculation(false); // Setzen Sie den TriggerCalculation-Zustand zurück
+            setTriggerCalculation(false); // Setz Trigger zurück
         }
     }, [triggerCalculation]);
 
