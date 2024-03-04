@@ -53,6 +53,12 @@ function App() {
 
     const [alphabet, setAlphabet] = useState(['a', 'b', 'c']);
 
+    const [implyTrashStates, setImplyTrashStates] = useState(false);
+
+    const toggleImplyTrashStates = () => {
+        setImplyTrashStates(!implyTrashStates);
+    };
+
     const plainField = () => {
         setNodes(exampleNodes);
         setEdges(exampleEdges);
@@ -73,7 +79,7 @@ function App() {
         setPartitions(updatedPartitions);
         setPartitionsHistory([]);
         setIsDfaResult(null);
-    }, [nodes, alphabet, edges]);
+    }, [nodes, alphabet, edges, implyTrashStates]);
 
     /**
      * Refs für die einzelnen Komponenten, damit kan nich dynamisch auf die Größenänderungen reagieren
@@ -218,6 +224,7 @@ function App() {
 
     };
 
+
     /**
      * Genau ein Startzustand: Es wird sichergestellt, dass genau ein Startzustand vorhanden ist.
      * Validität der Kantenlabels: Es wird überprüft, ob alle Kantenlabels gültige Symbole des Alphabets enthalten.
@@ -226,6 +233,8 @@ function App() {
      *
      * TODO Endzustandbehandlung
      *
+     * Hat jetzt einen Schalter um TrashStates zu implizieren oder nur vollständige Dfas zu akzeptieren
+     *
      * @param nodes
      * @param edges
      * @param alphabet
@@ -233,98 +242,90 @@ function App() {
      */
 
     function isDFA(nodes, edges, alphabet) {
+
         if (!nodes || !edges || !alphabet) {
             console.error('Einer der Inputs (nodes, edges, alphabet) ist nicht richtig definiert.');
             return false;
         }
 
-        // Gibt es genau einen Startzustand
+        // Überprüfung auf genau einen Startzustand
         const startStates = nodes.filter(node => node.data.input == true);
         if (startStates.length !== 1) {
             console.error("Es muss genau einen Startzustand geben.");
-            alert("Startzustand ist nicht eindeutig");
+            alert("Es muss genau einen Startzustand geben.")
             return false;
         }
-        const startStateId = startStates[0].id; //Breitensuche aufsetzpunkt
+        const startStateId = startStates[0].id;
         const transitions = new Map();
 
-        // Initialisieren der  Map mit den Übergängen leeren Sets
+        // Initialisieren der Transitions Map mit leeren Sets
         nodes.forEach(node => {
             alphabet.forEach(symbol => {
                 const key = `${node.id}-${symbol}`;
-                transitions.set(key, new Set());
+                transitions.set(key, null); // Initialisiert mit null für nicht definierte Übergänge
             });
         });
-        const stateLabels = new Set();
 
-        for (const node of nodes) {
-            if (stateLabels.has(node.data.label)) {
-                // Wenn das Label bereits im Set ist, gibt es ein Duplikat
-                console.error(`Mehrere Zustände mit dem Label '${node.data.label}' gefunden.`);
-                alert(`Es ist kein DFA. Mehrere Zustände mit dem Label '${node.data.label}' gefunden.`);
-                return false;
-            }
-            stateLabels.add(node.data.label);
-        }
-
-        // Verarbeiten der Kanten und Überprüfen der Symbole gegen das Alphabet
+        // Verarbeiten der Kanten
         for (const edge of edges) {
-
             const symbols = edge.label.split(/[,;\s]\s*/).map(symbol => symbol.trim());
-                /*
-                Ünterstützt mehrere Symbole pro Kante, Trennung mit , oder ; oder Leerzeichen möglich
-                 */
-
-            for (const symbol of symbols) {
+            symbols.forEach(symbol => {
                 if (!alphabet.includes(symbol)) {
-                    // Symbol nicht im Alphabet, daher kein gültiger DFA
                     console.error(`Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
-                    alert(`Es ist kein DFA. Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
-
+                    alert(`Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
                     return false;
                 }
                 const key = `${edge.source}-${symbol}`;
-                if (transitions.has(key)) {
-                    transitions.get(key).add(edge.target);
-                } else {
-                    // Initialisiert einen neuen Set, falls noch nicht vorhanden
-                    transitions.set(key, new Set([edge.target]));
+                if (transitions.get(key) !== null) {
+                    console.error(`Mehr als ein Übergang für das Symbol '${symbol}' beim Zustand '${edge.source}' definiert.`);
+                    return false;
                 }
-            }
+                transitions.set(key, edge.target); // Setzt den Zielzustand für den Übergang
+            });
         }
 
-        // Überprüfen, ob es für jedes Symbol in jedem Zustand höchstens einen Übergang gibt
-        for (let [key, targetStates] of transitions) {
-            if (targetStates.size > 1) {
-                alert(`Es ist kein DFA. Ungültiges Symbol beim Knoten '${key}' `);
-                console.error(`Ungültiges Symbol beim Knoten '${key}' gefunden.`);
-                // Mehr als ein Übergang für ein Symbol in einem Zustand gefunden das wid kein DFA sein
-
-                return false;
+        // Überprüfung auf Vollständigkeit des DFA
+        let isComplete = true;
+        transitions.forEach((targetState, key) => {
+            if (targetState === null && !implyTrashStates) {
+                // Wenn implyTrashStates false ist und ein Übergang fehlt, ist der DFA nicht vollständig
+                isComplete = false;
             }
+        });
+
+        if (!isComplete) {
+            console.error("DFA ist nicht vollständig. Es fehlen Übergänge für mindestens ein Symbol in mindestens einem Zustand.");
+            alert("DFA ist nicht vollständig. Es fehlen Übergänge für mindestens ein Symbol in mindestens einem Zustand.");
+            return false;
         }
 
-        //Sind alle Zustände vom Startzustand erreichbar
+        // Überprüfung der Erreichbarkeit aller Zustände
         let visited = new Set();
         let queue = [startStateId];
         while (queue.length > 0) {
             const currentState = queue.shift();
             if (!visited.has(currentState)) {
                 visited.add(currentState);
-                edges.forEach(edge => {
-                    if (edge.source === currentState && !visited.has(edge.target)) {
-                        queue.push(edge.target);
-                    }
+                nodes.forEach(node => {
+                    alphabet.forEach(symbol => {
+                        const key = `${currentState}-${symbol}`;
+                        const targetState = transitions.get(key);
+                        if (targetState && !visited.has(targetState)) {
+                            queue.push(targetState);
+                        }
+                    });
                 });
             }
         }
 
         if (visited.size !== nodes.length) {
-            alert("Nicht alle Zustände sind erreichbar.");
+            console.error("Nicht alle Zustände sind erreichbar.");
             return false;
         }
-        return true; // Der Automat ist ein DFA (wir implizieren Müllzustände))
+
+        return true; // Der Automat ist ein vollständiger DFA
     }
+
 
     /**
      * Erstmal die partitionierung mit einem einzigen Symbol
@@ -465,8 +466,16 @@ function App() {
                   <div>
                   <button onClick={resetPage} style={{ marginRight: '20px' }}> Reload</button>
                       <button onClick={plainField}> Beispiel </button>
+                      <div>
+                      <label className={implyTrashStates}>
+                          Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates}/>
+                      </label>
+                  </div>
               </div>
                   <div className="DFAContainer">
+
+
+
                       <button onClick={checkIsDFA}>Ist das ein DFA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
