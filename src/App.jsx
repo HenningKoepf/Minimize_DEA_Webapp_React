@@ -471,6 +471,8 @@ function App() {
         partitions.forEach((partition, index) => {
 
             const isOutput = partition.some(node => node.data.output);
+            const isInput = partition.some(node => node.data.input);
+
             const newNode = {
 
                 id: `P${index}`, // Eindeutige ID für den neuen Knoten
@@ -482,7 +484,11 @@ function App() {
                     backgroundColor: '#12e81d',
                     border: "2px solid black" ,
                     borderStyle: "double",
-                } : undefined // Setze Style wenn Output
+                } : isInput ? {
+                    backgroundColor: '#5a4eab', // Rot für Input-Knoten
+                    border: "2px solid black",
+                    borderStyle: "double",
+                } : undefined
 
 
 
