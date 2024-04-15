@@ -5,12 +5,14 @@ import ReactFlow, {
   Background,
   useNodesState,
   useEdgesState,
+
   addEdge,
     BaseEdge,
     Connection,
     ConnectionMode,
     Node, MarkerType
 } from 'reactflow';
+import { ReactFlowProvider } from 'react-flow-renderer'
 import 'reactflow/dist/style.css';
 import './styles/styles.css'
 import './updatenode.css';
@@ -20,13 +22,13 @@ import EdgeContextMenu from './components/EdgeContextMenu';
 import SelfConnectingEdge from './elements/SelfConnectingEdge';
 import BaseNode from './elements/BaseNode';
 
-//import { initialNodes, initialEdges } from './elements/initial-setup';
+
 import {initialNodes, initialEdges} from './elements/initial-setup2';
 import {initialNode, noEdges} from './elements/ClearBoard';
 import {exampleNodes, exampleEdges} from './elements/exampleDFA';
 import Partitioner from './components/Partitioner';
 import {findPartitionForState, findTargetState} from './components/Partitioner';
-//import {data } from "./data/data";
+
 import NodeLabelList from './components/NodeLabelList';
 
 const EdgeTypes = {
@@ -51,10 +53,12 @@ function App() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-    const [alphabet, setAlphabet] = useState(['a', 'b', 'c']);
+
+    const [alphabet, setAlphabet] = useState(['a', 'b']);
 
     const [implyTrashStates, setImplyTrashStates] = useState(false);
 
+    //umschalten ob Müllzustände impliziert werden "true" oder nicht "false"
     const toggleImplyTrashStates = () => {
         setImplyTrashStates(!implyTrashStates);
     };
@@ -62,8 +66,10 @@ function App() {
     const plainField = () => {
         setNodes(exampleNodes);
         setEdges(exampleEdges);
+        setAlphabet(['a', 'b', 'c']);
     }
 
+    //Erzeut die Startpartitionen mit Endzuständen und restlichen Zuständen
     const initialPartition = (nodes) => {
         const endStates = nodes.filter(node => node.data.output);
         const nonEndStates = nodes.filter(node => !node.data.output);
@@ -72,13 +78,17 @@ function App() {
 
     const [partitions, setPartitions] = useState(initialPartition(nodes));
     const [partitionsHistory, setPartitionsHistory] = useState([]);
+    //States für die Ausgabe des Äquivalenzautomaten
+    const [finalnodes, setfinalNodes, onfinalNodesChange] = useNodesState([]);
+    const [finaledges, setfinalEdges, onfinalEdgesChange] = useEdgesState([]);
 
-    //Wenn der Automat geändert wird, werden die Partitionen initialisiert.
+    //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen  initialisiert.
     useEffect(() => {
         const updatedPartitions = initialPartition(nodes);
         setPartitions(updatedPartitions);
         setPartitionsHistory([]);
         setIsDfaResult(null);
+
     }, [nodes, alphabet, edges, implyTrashStates]);
 
     /**
@@ -86,6 +96,7 @@ function App() {
      * @type {{current: (unknown|null)}}
      */
     const ref = useRef(null);
+    const refFinal = useRef(null);
     const kontrollContainerRef = useRef(null);
     const topTextRef = useRef(null);
 
@@ -166,20 +177,17 @@ function App() {
                     markerEnd: { type: MarkerType.ArrowClosed },
                 };
 
-                // Erstelle das Edge-Objekt mit dem Label
-
-                // Aktualisiere die Edge-Liste
+                // Aktualisiere die Edge-Liste mit der zusätzlichen Kante
                 setEdges((edges) => [...edges, newEdge]);
              }
             },
-// Zwei Knoten werden per Drag and Drop verbunden
         [setEdges]
     );
+
     /**
      * Öffnet das Kontextmenü der Knoten
      * @type {(function(*, *): void)|*}
      */
-//Kontextmenü der Knoten
 
 
     const onNodeContextMenu = useCallback(
@@ -201,7 +209,9 @@ function App() {
             const topTextHeight = topText.height;
 
             // Sicherstellen, dass das Menü nicht neben dem Fenster gerendert wrid
-            const left = Math.min(clickX- kontrollContainerWidth , pane.width - kontrollContainerWidth - 100); // Begrenze die linke Position entsprechend der Breite des .Kontrollcontainer
+            const left = Math.min(clickX- kontrollContainerWidth , pane.width - kontrollContainerWidth - 100);
+            // Begrenze die linke Position entsprechend der Breite des .Kontrollcontainer
+            // Grenze auch nach oben aber amnn kanns auh übertreiben
             const top = Math.min(clickY -topTextHeight, pane.height -topTextHeight - 100);
 
             setMenu({
@@ -269,7 +279,7 @@ function App() {
         // Verarbeiten der Kanten
         for (const edge of edges) {
             const symbols = edge.label.split(/[,;\s]\s*/).map(symbol => symbol.trim());
-            symbols.forEach(symbol => {
+            symbols.forEach(symbol =>  {
                 if (!alphabet.includes(symbol)) {
                     console.error(`Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
                     alert(`Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
@@ -289,13 +299,14 @@ function App() {
         transitions.forEach((targetState, key) => {
             if (targetState === null && !implyTrashStates) {
                 // Wenn implyTrashStates false ist und ein Übergang fehlt, ist der DFA nicht vollständig
+                alert("DFA ist nicht vollständig. Es fehlt der Übergang:" + key);
                 isComplete = false;
             }
         });
 
         if (!isComplete) {
             console.error("DFA ist nicht vollständig. Es fehlen Übergänge für mindestens ein Symbol in mindestens einem Zustand.");
-            alert("DFA ist nicht vollständig. Es fehlen Übergänge für mindestens ein Symbol in mindestens einem Zustand.");
+
             return false;
         }
 
@@ -412,11 +423,18 @@ function App() {
         setTriggerCalculation(true);  // Dies löst die Berechnung aus
     };
 
-
+    /**
+     * Button zum Neuladen der Website
+     */
     const resetPage = () =>{
         window.location.reload();
     }
 
+    /**
+     * Anzeige Rendering der neuen Partitionen mit Übergangssysmbol
+     * @param historyEntry
+     * @returns {JSX.Element}
+     */
     function renderPartitionWithSymbol(historyEntry) {
         if (!historyEntry || !historyEntry.partitions) {
             return <div>Partitionsgeschichte ist nicht verfügbar.</div>;
@@ -434,18 +452,114 @@ function App() {
         );
     }
 
+    /**
+     * Kreation des Äquivalenzautomaten basierend auf den aktuellen Partitionen
+     * @param partitions
+     * @returns {{newEdges: *[], newNodes: *[]}}
+     */
+    useEffect(() => {
+        createMinimizedGraph();
+    }, [partitions]); // Abhängigkeiten
+
+    const createMinimizedGraph = () => {
+        const newNodes = [];
+        const newEdges = [];
+        const partitionMap = {}; // Mapt die alten Knoten-IDs auf neue Knoten-IDs
+        const edgeLabelsMap = {}; // Mapts Labels für Kanten zwischen Partitionen
+
+        // Schritt 1: Neue Knoten erstellen
+        partitions.forEach((partition, index) => {
+
+            const isOutput = partition.some(node => node.data.output);
+            const newNode = {
+
+                id: `P${index}`, // Eindeutige ID für den neuen Knoten
+                data: { ...partition[0].data, label: "{" + partition.map(node => node.data.label).join(", ") +"}" },
+                position: calculateAveragePosition(partition, nodes),
+                targetPosition: 'left',
+                sourcePosition: 'right',
+                style: isOutput ? {
+                    backgroundColor: '#12e81d',
+                    border: "2px solid black" ,
+                    borderStyle: "double",
+                } : undefined // Setze Style wenn Output
+
+
+
+            };
+
+            newNodes.push(newNode);
+
+            // Aktualisiere die Partitionen
+            partition.forEach(node => {
+                partitionMap[node.id] = newNode.id;
+            });
+        });
+
+        // Schritt 2: Neue Kanten und deren Labels erstellen, einschließlich Selbstkanten
+        edges.forEach(edge => {
+            const sourcePartition = partitionMap[edge.source];
+            const targetPartition = partitionMap[edge.target];
+
+            // Generiere einen einzigartigen Schlüssel für jede Kantenverbindung zwischen Partitionen
+            const edgeKey = `${sourcePartition}->${targetPartition}`;
+            // Initialisiere das Label für die Kante, falls noch nicht geschehen
+            if (!edgeLabelsMap[edgeKey]) {
+                edgeLabelsMap[edgeKey] = { labels: new Set(), type: null };
+            }
+            // Überprüfe, ob die Kante eine Selbstkante ist
+            if (sourcePartition === targetPartition) {
+                edgeLabelsMap[edgeKey].type = 'selfconnecting';
+            }
+
+            const normalizedLabel = edge.label.replace(/,\s*/g, " "); // Ersetzt Kommas und darauf folgende Leerzeichen durch ein Leerzeichen
+            normalizedLabel.split(" ").forEach(label => edgeLabelsMap[edgeKey].labels.add(label)); //keine dupletten
+            //
+        });
+
+        //  neue Kanten basierend auf edgeLabelsMap, einschließlich Selbstkanten
+        Object.keys(edgeLabelsMap).forEach((key, index) => {
+            const [source, target] = key.split('->');
+            // Konvertiere das Set von Labels zurück in einen String, getrennt durch Leerzeichen
+            const labelsString = Array.from(edgeLabelsMap[key].labels).join(" ");
+            const newEdge = {
+                id: `e${index}`,
+                source: source,
+                target: target,
+                label: labelsString,
+                type: edgeLabelsMap[key].type
+            };
+            newEdges.push(newEdge);
+        });
+
+        setfinalNodes(newNodes);
+        setfinalEdges(newEdges);
+    };
+
+
+    //VErsuch automatisch neue Graphen zu positionierne
+
+    function calculateAveragePosition(partition, originalNodes) {
+        const positions = partition.map(node => {
+            const originalNode = originalNodes.find(n => n.id === node.id);
+            return originalNode.position;
+        });
+        const averagePosition = {
+            x: positions.reduce((acc, pos) => acc + pos.x, 0) / positions.length,
+            y: positions.reduce((acc, pos) => acc + pos.y, 0) / positions.length
+        };
+        return averagePosition;
+    }
+
+
 
 
     return (
       <>
      <div className="toptext" ref={topTextRef} >D F A ---  M I N I M I E R E R ! </div>
 
-          <div className="App"
-          style={{ width: '100vw', height: '60vw' }}>
-
+          <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
-
-
                   <legend><strong>Eingabe: </strong></legend>
                   <div>
                       <label>Alphabet bearbeiten:</label>
@@ -473,9 +587,6 @@ function App() {
                   </div>
               </div>
                   <div className="DFAContainer">
-
-
-
                       <button onClick={checkIsDFA}>Ist das ein DFA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
@@ -508,6 +619,8 @@ function App() {
                       ))}
                   </div>
           </div>
+              <div className="reactFlowsContainer" style={{ height: '140vh', width: '90%', marginBottom: '20px' }}>
+
         <ReactFlow
             ref={ref}
             nodes={nodes}
@@ -529,11 +642,38 @@ function App() {
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
 
+                  <div className="finalFlowrenderer" style={{ height: '65vh', width: '43%' }}>
+                  {partitions && isDfaResult &&(
+                  <ReactFlow
+                      ref={refFinal}
+                      nodes={finalnodes}
+                      edges={finaledges}
+                      onNodesChange={onfinalNodesChange}
+                      onEdgesChange={onfinalEdgesChange}
+                      edgeTypes={EdgeTypes}
+                      nodeTypes={NodeTypes}
+                      fitView
+                      nodesDraggable={false}
+                      nodesConnectable={false}
+                      elementsSelectable={false}
+                      paneMoveable={false}
+                      zoomOnScroll={false}
+                      zoomOnDoubleClick={false}
+                  >
+                      <Controls
+                          showZoom = {false}
+                          showInteractive ={false}/>
+                  </ReactFlow>
+                  )}
+                 </div>
+              </div>
           </div>
 
-          <footer>
+          <footer className="footer">
               <p><strong>&copy; 2024 Henning Köpf</strong> - <strong>Kontakt:</strong> ************@gmx.de</p>
           </footer>
+
+
           </>
 
   );

@@ -77,9 +77,9 @@ export const exampleEdges: Edge[] = [
         markerEnd: { type: MarkerType.ArrowClosed },
     },
     {
-        id: 'e-Z2-Z1-c',
+        id: 'e-Z2-Z4-c',
         source: 'Z2',
-        target: 'Z1',
+        target: 'Z4',
         label: 'c',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
@@ -101,7 +101,7 @@ export const exampleEdges: Edge[] = [
         id: 'e-Z2-self-ab',
         source: 'Z2',
         target: 'Z2',
-        type: 'selfconnecting', // Nutzen Sie Ihren definierten Self-Loop-Kantentyp
+        type: 'selfconnecting',
         label: 'a b',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
@@ -109,7 +109,7 @@ export const exampleEdges: Edge[] = [
         id: 'e-Z3-self-ab',
         source: 'Z3',
         target: 'Z3',
-        type: 'selfconnecting', // Nutzen Sie Ihren definierten Self-Loop-Kantentyp
+        type: 'selfconnecting',
         label: 'a b',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
@@ -117,11 +117,11 @@ export const exampleEdges: Edge[] = [
         id: 'e-Z1-self-a',
         source: 'Z1',
         target: 'Z1',
-        type: 'selfconnecting', // Nutzen Sie Ihren definierten Self-Loop-Kantentyp
+        type: 'selfconnecting',
         label: 'a',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
-    // Self loop für Z4 mit 'a, b, c'
+
     {
         id: 'e-Z4-Z5-abc',
         source: 'Z4',
@@ -130,7 +130,7 @@ export const exampleEdges: Edge[] = [
         label: 'a, b, c',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
-    // Self loop für Z5 mit 'a, b, c'
+
     {
         id: 'e-Z5-Z4-abc',
         source: 'Z5',
@@ -139,5 +139,5 @@ export const exampleEdges: Edge[] = [
         label: 'a, b, c',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
-    // ... andere Kanten, wie nötig
+
 ];
