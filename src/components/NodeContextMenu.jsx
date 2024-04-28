@@ -48,14 +48,41 @@ export default function NodeContextMenu({
 
   /**
    * Knoten wird entfernt und jegliche damit zusammenhzängende Kanten werden aus dem DOM gelöscht
+   * Wenn es nur einen inputKnoten oder nur einen Outputknoten gibt, kann der letzte nicht gelöscht werden
    * @type {(function(): void)|*}
    */
 
+
   const deleteNode = useCallback(() => {
-    setNodes((nodes) => nodes.filter((node) => node.id !== id));
-    setEdges((edges) => edges.filter((edge) => edge.source !== id));
-    setEdges((edges) => edges.filter((edge) => edge.target !== id));
+    setNodes((nodes) => {
+
+      const outputNodesCount = nodes.filter(node => node.data.output).length;
+      const inputNodesCount = nodes.filter(node => node.data.input).length;
+
+      const nodeToDelete = nodes.find(node => node.id === id);
+
+      // Überprüfe, ob der zu löschende Knoten ein Output- oder Input-Knoten ist
+      const isOutputNode = nodeToDelete?.data.output;
+      const isInputNode = nodeToDelete?.data.input;
+
+      // Verhindere das Löschen, wenn es der letzte Output- oder Input-Knoten ist
+      if ((isOutputNode && outputNodesCount === 1) || (isInputNode && inputNodesCount === 1)) {
+        console.error("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
+        alert("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
+        return nodes;
+      }
+      else{
+
+      // Sonst lösche übergänge und Knoten
+        setEdges((edges) => edges.filter((edge) => edge.source !== id));
+        setEdges((edges) => edges.filter((edge) => edge.target !== id));
+      return nodes.filter((node) => node.id !== id);
+      }
+    });
   }, [id, setNodes, setEdges]);
+
+
+
 
   /**
    * Funktion um einem Knoten den Zustand eines "Startzustandes" zu verpassen, inkl styling
@@ -65,7 +92,7 @@ export default function NodeContextMenu({
     setNodes((nodes) =>
         nodes.map((node) => {
           if (node.id === id){
-            return {...node,  data: {...node.data, input: true} ,style: {backgroundColor: '#1ec212'},}
+            return {...node,  data: {...node.data, input: true} ,style: {...node.style, backgroundColor: '#5a4eab'},}
           }
           return node;
         })
@@ -83,11 +110,12 @@ export default function NodeContextMenu({
           if (node.id === id){
             let text = node.data.label;
             return {...node ,targetPosition: 'left',
-              style: {
+              style: {...node.style,
                 backgroundColor: '#12e81d',
                 border: "2px solid black" ,
                 borderStyle: "double",},
-              sourcePosition: 'right',  data: { label: text, output: true }}
+              sourcePosition: 'right',
+              data: { label: text, output: true }}
           }
           return node;
         })
@@ -95,16 +123,35 @@ export default function NodeContextMenu({
   }, [id, setNodes, getNode, addNodes]);
 
 
-  const colorNode = useCallback(() => {
-    setNodes((nodes) =>
-      nodes.map((node) => {
-        if (node.id === id){
-          return {...node,  style: {backgroundColor: '#1ec212'},}
+  const defaultNode = useCallback(() => {
+    setNodes((nodes) => {
+      //neu auszählen wieviele es von output/input konten gibt
+      const outputNodesCount = nodes.filter(node => node.data.output).length;
+      const inputNodesCount = nodes.filter(node => node.data.input).length;
+
+
+      return nodes.map((node) => {
+        if (node.id === id) {
+          // Überprüfe, ob es sich um den letzten Output- oder Input-Knoten handelt
+          const isLastOutputNode = node.data.output && outputNodesCount === 1;
+          const isLastInputNode = node.data.input && inputNodesCount === 1;
+
+          // Verhindere die Änderung, wenn es der letzte Knoten seiner Art ist
+          if (isLastOutputNode || isLastInputNode) {
+            console.error("Die Standardisierung des letzten Output- oder Input-Knotens ist nicht erlaubt.");
+            return node; // Gib den unveränderten Knoten zurück
+          }
+
+        //Text übernehmen aber input/output initalisierren
+          let text = node.data.label;
+          return { ...node, data: { label: text }, style: undefined };
         }
-      return node;
-      })
-     );
+
+        return node;
+      });
+    });
   }, [id, setNodes]);
+
 
   /**
    * Funktion um einen Knoten umzubenennen, autom. rerendering über Callback
@@ -142,10 +189,9 @@ export default function NodeContextMenu({
       <button onClick={duplicateNode}>Neuer Zustand </button>
       <button onClick={deleteNode}>Zustand Löschen</button>
       <button onClick ={renameNode}>Zustand Umbenennen</button>
-      <button onClick={colorNode}>Einfärben</button>
+      <button onClick={defaultNode}>Standard Zustand</button>
       <button onClick = {changeToInputNode}>Zu Startzustand</button>
       <button onClick = {changeToOutputNode}>Zu Endzustand</button>
-
     </div>
   );
 }

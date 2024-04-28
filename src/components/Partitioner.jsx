@@ -65,7 +65,7 @@ const formatPartitions = (partitions) => {
 function refinePartitions(partitions, edges, symbol) {
     let newPartitions = [];
 
-    // Durchlaufe jede Partition
+    // Loope jede Partition
     partitions.forEach(partition => {
         let partitionMap = new Map();
 
@@ -95,7 +95,6 @@ function refinePartitions(partitions, edges, symbol) {
         });
     });
 
-    // Rückgabe der neu gebildeten Partitionen
     return newPartitions;
 }
 

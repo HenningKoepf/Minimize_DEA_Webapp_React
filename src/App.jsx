@@ -459,7 +459,7 @@ function App() {
      */
     useEffect(() => {
         createMinimizedGraph();
-    }, [partitions]); // Abhängigkeiten
+    }, [partitions]); // Abhängigkeit von der existenz der Partitionen
 
     const createMinimizedGraph = () => {
         const newNodes = [];
@@ -470,8 +470,8 @@ function App() {
         // Schritt 1: Neue Knoten erstellen
         partitions.forEach((partition, index) => {
 
-            const isOutput = partition.some(node => node.data.output);
-            const isInput = partition.some(node => node.data.input);
+            const isOutput = partition.some(node => node?.data?.output);
+            const isInput = partition.some(node => node?.data?.input);
 
             const newNode = {
 
@@ -485,13 +485,8 @@ function App() {
                     border: "2px solid black" ,
                     borderStyle: "double",
                 } : isInput ? {
-                    backgroundColor: '#5a4eab', // Rot für Input-Knoten
-                    border: "2px solid black",
-                    borderStyle: "double",
+                    backgroundColor: '#786bd3',
                 } : undefined
-
-
-
             };
 
             newNodes.push(newNode);
