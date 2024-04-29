@@ -69,13 +69,15 @@ export default function NodeContextMenu({
         console.error("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
         alert("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
         return nodes;
+
       }
       else{
 
-      // Sonst lösche übergänge und Knoten
-        setEdges((edges) => edges.filter((edge) => edge.source !== id));
-        setEdges((edges) => edges.filter((edge) => edge.target !== id));
-      return nodes.filter((node) => node.id !== id);
+      // Sonst lösche alle übergänge aus dem state und den Knoten
+        const newNodes = nodes.filter((node) => node.id !== id);
+        setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));  // Kombiniere beide Filteroperationen für react states
+        return newNodes;
+
       }
     });
   }, [id, setNodes, setEdges]);
@@ -93,7 +95,17 @@ export default function NodeContextMenu({
         nodes.map((node) => {
 
           if (node.id === id){
-            return {...node,  data: {...node.data, input: true} ,style: {...node.style, backgroundColor: '#5a4eab'},}
+            const currentlyInput = node.data.input;
+            const newInputState = !currentlyInput;
+
+            const newStyle = newInputState ? {
+              ...node.style, backgroundColor: '#a4d36b'}
+                : {
+              ...node.style,
+              backgroundColor: undefined,
+            };
+
+            return {...node,  data: {...node.data, input: newInputState} ,style: {...newStyle},}
           }
           return node;
         })
@@ -109,13 +121,25 @@ export default function NodeContextMenu({
     setNodes((nodes) =>
         nodes.map((node) => {
           if (node.id === id){
+            const currentlyOutput = node.data.output;
+            const newOutputState = !currentlyOutput;
+
             let text = node.data.label;
+
+            const newStyle = newOutputState ? {
+              ...node.style,
+              border: "3px solid black",
+              borderStyle: "double",
+            } : {
+              ...node.style,
+              border: undefined,
+              borderStyle: undefined,
+            };
+
             return {...node ,targetPosition: 'left',
-              style: {...node.style,
-                border: "3px solid black" ,
-                borderStyle: "double",},
+              style: { ...newStyle},
               sourcePosition: 'right',
-              data: { ...node.data,label: text, output: true }}
+              data: { ...node.data,label: text, output: newOutputState }}
           }
           return node;
         })
@@ -190,8 +214,8 @@ export default function NodeContextMenu({
       <button onClick={deleteNode}>Zustand Löschen</button>
       <button onClick ={renameNode}>Zustand Umbenennen</button>
       <button onClick={defaultNode}>Standard Zustand</button>
-      <button onClick = {changeToInputNode}>Zu Startzustand</button>
-      <button onClick = {changeToOutputNode}>Zu Endzustand</button>
+      <button onClick = {changeToInputNode}>Startzustand umschalten</button>
+      <button onClick = {changeToOutputNode}>Endzustand umschalten</button>
     </div>
   );
 }

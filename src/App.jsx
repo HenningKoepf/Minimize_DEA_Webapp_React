@@ -350,7 +350,6 @@ function App() {
     function partitionDFAWithEdge(partitions, edges, selectedEdge) {
         let newPartitions = [];
         let changed = false;
-
         // Finde das Übergangssymbol der ausgewählten Kante
         const selectedSymbol = selectedEdge.label;
 
@@ -482,20 +481,19 @@ function App() {
 
             let style = {};
             if (isInput) {
-                style.backgroundColor = '#786bd3';
+                style.backgroundColor = '#a4d36b';
             }
             if (isOutput) {
                 style.border = "3px solid black";
                 style.borderStyle = "double";
             }
             if (isInput && isOutput) {
-                // Kombiniere das Styling für Knoten, die sowohl Input als auch Output sind
-                style = {
-                    border: "3px solid black" ,
-                    borderStyle: "double",
-                    backgroundColor: '#786bd3',
-                };
-            }
+                // Kombiniertes styling für Knoten, die sowohl Input als auch Output sind
+                    style.border = "3px solid black" ;
+                    style.borderStyle= "double";
+                    style.backgroundColor = '#a4d36b';
+                }
+
             const newNode = {
 
                 id: `P${index}`, // Eindeutige ID für den neuen Knoten
