@@ -471,6 +471,11 @@ function App() {
 
         // Schritt 1: Neue Knoten erstellen
         partitions.forEach((partition, index) => {
+            if (partition.length === 0) {
+                //edge case wenn input= output und keine anderen Knoten verfügbar
+                console.error("Leere Partition entdeckt, überspringe diese Partition.");
+                return; //die partition wird übersprungen, da sie leer ist
+            }
 
             const isOutput = partition.some(node => node?.data?.output);
             const isInput = partition.some(node => node?.data?.input);
