@@ -90,7 +90,9 @@ export default function NodeContextMenu({
    */
   const changeToInputNode = useCallback(() => {
     setNodes((nodes) =>
+
         nodes.map((node) => {
+
           if (node.id === id){
             return {...node,  data: {...node.data, input: true} ,style: {...node.style, backgroundColor: '#5a4eab'},}
           }
@@ -111,11 +113,10 @@ export default function NodeContextMenu({
             let text = node.data.label;
             return {...node ,targetPosition: 'left',
               style: {...node.style,
-                backgroundColor: '#12e81d',
-                border: "2px solid black" ,
+                border: "3px solid black" ,
                 borderStyle: "double",},
               sourcePosition: 'right',
-              data: { label: text, output: true }}
+              data: { ...node.data,label: text, output: true }}
           }
           return node;
         })
@@ -125,7 +126,7 @@ export default function NodeContextMenu({
 
   const defaultNode = useCallback(() => {
     setNodes((nodes) => {
-      //neu auszählen wieviele es von output/input konten gibt
+
       const outputNodesCount = nodes.filter(node => node.data.output).length;
       const inputNodesCount = nodes.filter(node => node.data.input).length;
 
@@ -138,8 +139,8 @@ export default function NodeContextMenu({
 
           // Verhindere die Änderung, wenn es der letzte Knoten seiner Art ist
           if (isLastOutputNode || isLastInputNode) {
-            console.error("Die Standardisierung des letzten Output- oder Input-Knotens ist nicht erlaubt.");
-            return node; // Gib den unveränderten Knoten zurück
+            alert("Die Standardisierung des letzten Output- oder Input-Knotens ist nicht erlaubt.");
+            return node;
           }
 
         //Text übernehmen aber input/output initalisierren

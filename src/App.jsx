@@ -229,7 +229,7 @@ function App() {
 
     const checkIsDFA = () => {
         setIsDfaResult((prev) => null);
-        const result = isDFA(nodes, edges, alphabet);
+        let result = isDFA(nodes, edges, alphabet);
         setIsDfaResult(result);
 
     };
@@ -272,14 +272,15 @@ function App() {
         nodes.forEach(node => {
             alphabet.forEach(symbol => {
                 const key = `${node.id}-${symbol}`;
-                transitions.set(key, null); // Initialisiert mit null für nicht definierte Übergänge
+                transitions.set(key, null); //null für evtl. Müllzustände
             });
         });
 
         // Verarbeiten der Kanten
         for (const edge of edges) {
             const symbols = edge.label.split(/[,;\s]\s*/).map(symbol => symbol.trim());
-            symbols.forEach(symbol =>  {
+            for (const symbol of symbols) {
+
                 if (!alphabet.includes(symbol)) {
                     console.error(`Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
                     alert(`Ungültiges Symbol '${symbol}' in Kante '${edge.id}' gefunden.`);
@@ -288,10 +289,11 @@ function App() {
                 const key = `${edge.source}-${symbol}`;
                 if (transitions.get(key) !== null) {
                     console.error(`Mehr als ein Übergang für das Symbol '${symbol}' beim Zustand '${edge.source}' definiert.`);
+                    alert(`Mehr als ein Übergang für das Symbol '${symbol}' beim Zustand '${edge.source}' definiert.`);
                     return false;
                 }
                 transitions.set(key, edge.target); // Setzt den Zielzustand für den Übergang
-            });
+            };
         }
 
         // Überprüfung auf Vollständigkeit des DFA
@@ -481,7 +483,7 @@ function App() {
                 targetPosition: 'left',
                 sourcePosition: 'right',
                 style: isOutput ? {
-                    backgroundColor: '#12e81d',
+
                     border: "2px solid black" ,
                     borderStyle: "double",
                 } : isInput ? {
