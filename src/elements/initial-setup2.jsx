@@ -31,8 +31,7 @@ export const initialNodes: Node[] = [
     {
         id: 'Z5',
         style: {
-            backgroundColor: '#12e81d',
-            border: "2px solid black" ,
+            border: "3px solid black" ,
             borderStyle: "double",
         },
         data: {label: 'Z5', output: true },
@@ -43,8 +42,7 @@ export const initialNodes: Node[] = [
     {
         id: 'Z6',
         style: {
-            backgroundColor: '#12e81d',
-            border: "2px solid black" ,
+            border: "3px solid black" ,
             borderStyle: "double",
         },
         data: {label: 'Z6', output: true },

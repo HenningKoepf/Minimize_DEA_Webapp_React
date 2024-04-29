@@ -42,8 +42,7 @@ export default function NodeContextMenu({
     };
     const newNodeLabel = node.data.label.concat("0");
 
-    //addNodes({ ...node, id: `${node.id}-copy`, position});
-    addNodes({ ...node,id: newNodeLabel, position, data:{...node.data, label: newNodeLabel}});
+    addNodes({ ...node,id: newNodeLabel, position, data:{ label: newNodeLabel}, style: {}});
   }, [id, getNode, addNodes]);
 
   /**
