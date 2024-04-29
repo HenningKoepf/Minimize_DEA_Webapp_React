@@ -475,6 +475,22 @@ function App() {
             const isOutput = partition.some(node => node?.data?.output);
             const isInput = partition.some(node => node?.data?.input);
 
+            let style = {};
+            if (isInput) {
+                style.backgroundColor = '#786bd3';
+            }
+            if (isOutput) {
+                style.border = "3px solid black";
+                style.borderStyle = "double";
+            }
+            if (isInput && isOutput) {
+                // Kombiniere das Styling für Knoten, die sowohl Input als auch Output sind
+                style = {
+                    border: "3px solid black" ,
+                    borderStyle: "double",
+                    backgroundColor: '#786bd3',
+                };
+            }
             const newNode = {
 
                 id: `P${index}`, // Eindeutige ID für den neuen Knoten
@@ -482,13 +498,7 @@ function App() {
                 position: calculateAveragePosition(partition, nodes),
                 targetPosition: 'left',
                 sourcePosition: 'right',
-                style: isOutput ? {
-
-                    border: "2px solid black" ,
-                    borderStyle: "double",
-                } : isInput ? {
-                    backgroundColor: '#786bd3',
-                } : undefined
+                style: Object.keys(style).length > 0 ? style : undefined //entweder Style schon vorhanden, oder default node
             };
 
             newNodes.push(newNode);

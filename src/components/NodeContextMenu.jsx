@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback} from 'react';
 import { useReactFlow } from 'reactflow';
-import Inputform from './Inputform';
+
 
 /**
  * Öffnet ein Kontextmenü bei Rechtsklick auf einen Knoten um diesen zu
