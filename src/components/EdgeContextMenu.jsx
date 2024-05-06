@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback} from 'react';
 import { useReactFlow } from 'reactflow';
 
 
@@ -8,12 +8,17 @@ export default function EdgeContextMenu({
                                             left,
                                             right,
                                             bottom,
+                                            partitionDFAWithEdge,
+                                            partitions,
+                                            edges,
+                                            setPartitions,
                                             ...props
                                         }) {
-    const { getEdge, setEdge, addEdges, setEdges } = useReactFlow();
+    const { getEdge, setEdges } = useReactFlow();
 
 
-
+    const edge = getEdge(id);
+    const symbols = edge.label.split(/[,;\s]+/);
 
     const deleteEdge = useCallback(() => {
         setEdges((edges) => edges.filter((edge) => edge.id !== id));
@@ -40,6 +45,15 @@ export default function EdgeContextMenu({
         }
     }, [id,setEdges]);
 
+    const initiatePartitioning = useCallback((selectedSymbol) => {
+        const selectedEdge = getEdge(id);  // Assume getEdge is a method to get edge details
+        if (selectedEdge) {
+
+            partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol);
+
+        }
+    }, [id, getEdge, partitionDFAWithEdge, partitions, edges]);
+
 
 
 
@@ -52,7 +66,12 @@ export default function EdgeContextMenu({
             <p style={{ margin: '0.5em' }}>
                 <small>Edge: {id}</small>
             </p>
-            <button onClick ={deleteEdge}>später verknüpfen</button>
+
+            {symbols.map((symbol, index) => (
+                <button key={index} onClick={() => initiatePartitioning(symbol)}>
+                    Prüfe Zeichen: {symbol}
+                </button>
+            ))}
 
             <button onClick ={deleteEdge}>Kante Löschen</button>
             <button onClick ={renameEdge}>Umbenennen</button>

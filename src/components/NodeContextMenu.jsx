@@ -114,6 +114,7 @@ export default function NodeContextMenu({
 
   /**
    * Funktion um einem Knoten den Zustand eines "Endzustandes" zu verpassen, inkl styling
+   * Wenn der aktuelle Knoten ein Inputknoten ist, werden dessen props erweitert aber nicht überschrieben
    * @type {(function(): void)|*}
    */
 

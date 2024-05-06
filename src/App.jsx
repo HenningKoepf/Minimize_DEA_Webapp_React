@@ -64,8 +64,9 @@ function App() {
     };
 
     const plainField = () => {
-        setNodes(exampleNodes);
-        setEdges(exampleEdges);
+
+        setNodes(prev => exampleNodes);
+        setEdges(prev => exampleEdges);
         setAlphabet(['a', 'b', 'c']);
     }
 
@@ -81,6 +82,9 @@ function App() {
     //States für die Ausgabe des Äquivalenzautomaten
     const [finalnodes, setfinalNodes, onfinalNodesChange] = useNodesState([]);
     const [finaledges, setfinalEdges, onfinalEdgesChange] = useEdgesState([]);
+
+    //States für Hovering
+    const [hoverIndex, setHoverIndex] = useState(null);
 
     //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen  initialisiert.
     useEffect(() => {
@@ -142,9 +146,13 @@ function App() {
                 right: event.clientX >= pane.width - 200 && pane.width - event.clientX,
                 bottom:
                     event.clientY >= pane.height - 200 && pane.height - event.clientY,
+                partitions: partitions,
+                edges: edges,
+                partitionDFAWithEdge: partitionDFAWithEdge,
+                setPartitions: setPartitions,
             });
         },
-        [setEdgeMenu],
+        [setEdgeMenu, edges, nodes, partitions],
     );
 
     /**
@@ -347,21 +355,20 @@ function App() {
      * @param selectedEdge
      * @returns {{partitions: *[], changed: boolean}}
      */
-    function partitionDFAWithEdge(partitions, edges, selectedEdge) {
+    function partitionDFAWithEdge(partitions, edges, selectedEdge,selectedSymbol) {
         let newPartitions = [];
         let changed = false;
         // Finde das Übergangssymbol der ausgewählten Kante
-        const selectedSymbol = selectedEdge.label;
+        //const selectedSymbol = selectedEdge.label;
 
         partitions.forEach(partition => {
             let targetPartitionMap = new Map();
 
             partition.forEach(node => {
                 // Prüfe, ob der aktuelle Knoten der Quellknoten der ausgewählten Kante ist
-                if (node.id === selectedEdge.source) {
                     const target = findTargetState(node, selectedSymbol, edges);
 
-                    if (target !== null) { // Ignoriere Müllzustände
+                    if (target !== null) { // behandle keine Müllzustände
                         const targetPartition = findPartitionForState(target, partitions);
                         if (targetPartition) {
                             let nodes = targetPartitionMap.get(targetPartition) || [];
@@ -369,17 +376,12 @@ function App() {
                             targetPartitionMap.set(targetPartition, nodes);
                         }
                     } else {
-                        // Behandle Knoten ohne gültigen Übergang für das Symbol separat
+                        // Behandle Knoten ohne gültigen Übergang für das Symbol als müll separat
                         let nodes = targetPartitionMap.get(null) || [];
                         nodes.push(node);
                         targetPartitionMap.set(null, nodes);
                     }
-                } else {
-                    // Knoten, die nicht Quellknoten der ausgewählten Kante sind, bleiben unverändert
-                    let nodes = targetPartitionMap.get(partition) || [];
-                    nodes.push(node);
-                    targetPartitionMap.set(partition, nodes);
-                }
+
             });
 
             // Erstelle neue Partitionen basierend auf der Gruppierung
@@ -392,7 +394,9 @@ function App() {
         });
 
         // Gib die neuen Partitionen und das Änderungsflag zurück
-        return { partitions: newPartitions, changed };
+
+         setPartitions(newPartitions);
+      //  return { partitions: newPartitions, changed };
     }
 
     /**
@@ -442,7 +446,7 @@ function App() {
         }
 
         return (
-            <div className="partition-with-symbol">
+            <div className="partition-with-symbol" >
                 {historyEntry.partitions.map((partition, partitionIndex) => (
                     <span key={partitionIndex}>
                     {partition.map(node => node.id).join(" ")} {partitionIndex < historyEntry.partitions.length - 1 ? "| " : ""}
@@ -453,6 +457,12 @@ function App() {
         );
     }
 
+    /**
+     * hoverover Partitions entry
+     */
+    function hoverhistoryentry(historyEntry, index){
+
+    }
     /**
      * Kreation des Äquivalenzautomaten basierend auf den aktuellen Partitionen
      * @param partitions
@@ -558,8 +568,21 @@ function App() {
     function calculateAveragePosition(partition, originalNodes) {
         const positions = partition.map(node => {
             const originalNode = originalNodes.find(n => n.id === node.id);
-            return originalNode.position;
-        });
+            if (!originalNode) {
+                alert(`Knoten mit ID ${node.id} nicht gefunden.`);
+
+            }
+            else{
+
+                return originalNode.position;
+            }
+        }).filter(pos => pos !== null); // Filtere ungültige Positionen heraus
+
+        if (positions.length === 0) {
+            console.error('Keine gültigen Positionen gefunden');
+            return { x: 0, y: 0 }; // Setze eine Standardposition
+        }
+
         const averagePosition = {
             x: positions.reduce((acc, pos) => acc + pos.x, 0) / positions.length,
             y: positions.reduce((acc, pos) => acc + pos.y, 0) / positions.length
@@ -567,8 +590,29 @@ function App() {
         return averagePosition;
     }
 
+    /**
+     *  dynamisches Stylen der Edges als enhance edges mit  hover-based styling
+     */
 
+        //
+    const getEnhancedEdges = useCallback(() => {
+            return finaledges.map(edge => {
 
+                // sollte die Kante highlighted werden?
+                const shouldHighlight = hoverIndex !== null && edge.label.split(/[,;\s]\s*/).some(
+                    symbol => partitionsHistory[hoverIndex]?.symbol.includes(symbol)
+                );
+
+                return {
+                    ...edge,
+                    style: {
+                        ...edge.style,
+                        strokeWidth: shouldHighlight ? 2 : 1,
+                        stroke: shouldHighlight ? 'red' : '#b1b1b7'
+                    }
+                };
+            });
+        }, [finaledges, hoverIndex, partitionsHistory]);
 
     return (
       <>
@@ -579,13 +623,12 @@ function App() {
                   <legend><strong>Eingabe: </strong></legend>
                   <div>
                       <label>Alphabet bearbeiten:</label>
-                      <input
+                      <input className= "inputAlphabet"
                           type="text"
                           value={inputAlphabet}
-                          onInput={(e) => {handleAlphabetInput(e)}}
-                      />
+                          onInput={(e) => {handleAlphabetInput(e)}}/>
                   </div>
-                      <div>Aktuelle Konfiguration:</div>
+                      <div className ="aktuelleKonfiguration">  Aktuelle Konfiguration:</div>
                       <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
                       <div className="zustände">{`Z = {${nodes.map((node) => node.data.label).join(",  ")}}`}</div>
                           <div className="zustände">
@@ -608,32 +651,13 @@ function App() {
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
                   </div>
-
-                      <Partitioner
-                          isDfaResult={isDfaResult}
-                          nodes={nodes}
-                          edges={edges}
-                          alphabet={alphabet}
-                          partitions={partitions}
-                          setPartitions={setPartitions}
-                          triggerCalculation={triggerCalculation}
-                          setTriggerCalculation={setTriggerCalculation}
-                          partitionsHistory={partitionsHistory}
-                          setPartitionsHistory={setPartitionsHistory}
-                      />
                   <div className="partitionen">
                       {partitions.map((partition, index) =>
                           partition.map(node => node.data.label).join("  ") + (index < partitions.length - 1 ? " | " : "")
                       )}
                   </div>
-                  <div className="partition-history">
-                      {partitionsHistory.map((historyEntry, index) => (
-                          <div key={index} className="history-entry">
-                              <div className="step-number">{index+1}.Step</div>
-                              {renderPartitionWithSymbol(historyEntry)}
-                          </div>
-                      ))}
-                  </div>
+
+
           </div>
               <div className="reactFlowsContainer" style={{ height: '140vh', width: '90%', marginBottom: '20px' }}>
 
@@ -658,12 +682,15 @@ function App() {
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
 
+            <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
+
                   <div className="finalFlowrenderer" style={{ height: '65vh', width: '43%' }}>
                   {partitions && isDfaResult &&(
                   <ReactFlow
                       ref={refFinal}
                       nodes={finalnodes}
-                      edges={finaledges}
+
+                      edges={getEnhancedEdges()}
                       onNodesChange={onfinalNodesChange}
                       onEdgesChange={onfinalEdgesChange}
                       edgeTypes={EdgeTypes}
@@ -682,7 +709,38 @@ function App() {
                   </ReactFlow>
                   )}
                  </div>
+                <div className= "partitiondiv" style={{ display: 'flex', flexDirection: 'column' , padding: '20px'}}>
+                <Partitioner
+                    isDfaResult={isDfaResult}
+                    nodes={nodes}
+                    edges={edges}
+                    alphabet={alphabet}
+                    partitions={partitions}
+                    setPartitions={setPartitions}
+                    triggerCalculation={triggerCalculation}
+                    setTriggerCalculation={setTriggerCalculation}
+                    partitionsHistory={partitionsHistory}
+                    setPartitionsHistory={setPartitionsHistory}
+                />
+
+                <div className="partition-history">
+                    {partitionsHistory.map((historyEntry, index) => (
+                        <div key={index}
+                             className={"history-entry" + (hoverIndex === index ? " hover" : "")}
+                             onMouseEnter={() => setHoverIndex(index)}
+                             onMouseLeave={() => setHoverIndex(null)}>
+                            <div className="step-number" >{index+1}.Schritt:</div>
+                            <br/>
+                            {renderPartitionWithSymbol(historyEntry)}
+
+                            <div style={{ height: '20px' }}></div>
+                        </div>
+                    ))}
+                </div>
+                </div>
               </div>
+
+            </div>
           </div>
 
           <footer className="footer">

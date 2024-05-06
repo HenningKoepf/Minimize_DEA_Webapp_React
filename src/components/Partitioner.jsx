@@ -145,7 +145,7 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
         return (
             <>
                 <button onClick={handleCalculateClick}>Berechnung lösen</button>
-                <h2>Partitionen</h2>
+                <h2> Zustandsklassen </h2>
             </>
         );
     }

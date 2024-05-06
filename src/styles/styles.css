@@ -165,6 +165,7 @@ Dicker Rand für Endzustand
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 10px;
+
   flex-direction: column; /* Anordnung der Inhalte in Spalten */
   align-items: flex-start; /* Horizontale Ausrichtung */
   justify-content: flex-start; /* Vertikale Ausrichtung */
@@ -176,14 +177,20 @@ Dicker Rand für Endzustand
 
 .Kontrollcontainer input {
   width: 100%;
-  padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  font-weight: bold;
+}
+.Kontrollcontainer .aktuelleKonfiguration {
+  font-weight: bold;
+  margin-top: 10px;
+
 }
 
 .Kontrollcontainer .alphabet {
   font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
-  margin-top: 5px;
+  margin-top: 10px;
+
 }
 .Kontrollcontainer .zustände {
   font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
@@ -192,6 +199,15 @@ Dicker Rand für Endzustand
 }
 
 .Kontrollcontainer button {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px; /* Abstand zum vorherigen Element */
+}
+.partitiondiv button {
   background-color: #007bff;
   color: white;
   padding: 5px 10px;
@@ -252,7 +268,7 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .history-entry + .history-entry {
-  margin-top: 5px; /* Reduzieren Sie den Abstand zwischen den Einträgen */
+  margin-top: 5px; /* Reduziertden Abstand zwischen den Einträgen */
 }
 
 /* NodeLabelList *//* NodeLabelList.css */
@@ -316,6 +332,10 @@ Anzeige der bisherigen Partitionen scrollbar
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  flex-direction: row;
+}
+.history-entry.hover .step-number {
+  font-weight: bold; /* Macht den Text fett */
 }
 
 .partition-row {
