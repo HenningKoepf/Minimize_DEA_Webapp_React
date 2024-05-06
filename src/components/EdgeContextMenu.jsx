@@ -17,6 +17,7 @@ export default function EdgeContextMenu({
     const { getEdge, setEdges } = useReactFlow();
 
 
+
     const edge = getEdge(id);
     const symbols = edge.label.split(/[,;\s]+/);
 

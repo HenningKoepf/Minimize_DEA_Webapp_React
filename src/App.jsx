@@ -355,7 +355,9 @@ function App() {
      * @param selectedEdge
      * @returns {{partitions: *[], changed: boolean}}
      */
+        const history = [{symbol: 'Start', partitions: partitions}];
     function partitionDFAWithEdge(partitions, edges, selectedEdge,selectedSymbol) {
+
         let newPartitions = [];
         let changed = false;
         // Finde das Übergangssymbol der ausgewählten Kante
@@ -390,13 +392,22 @@ function App() {
                     changed = true; // Die Partition wurde geändert
                 }
                 newPartitions.push(nodes);
+
+
             });
         });
 
-        // Gib die neuen Partitionen und das Änderungsflag zurück
-
+        // Gib die neuen Partitionen und das Änderungsflag zurück appende die History
+        setPartitionsHistory(prevHistory => {
+            //hatten wir das Symbol schon?
+            const symbolExists = prevHistory.some(entry => entry.symbol === selectedSymbol);
+            if (!symbolExists) {
+                return [...prevHistory, { symbol: selectedSymbol, partitions: newPartitions }];
+            }
+            return prevHistory; // Keine Änderung, wenn Symbol bereits vorhanden
+        });
          setPartitions(newPartitions);
-      //  return { partitions: newPartitions, changed };
+
     }
 
     /**
@@ -457,12 +468,7 @@ function App() {
         );
     }
 
-    /**
-     * hoverover Partitions entry
-     */
-    function hoverhistoryentry(historyEntry, index){
 
-    }
     /**
      * Kreation des Äquivalenzautomaten basierend auf den aktuellen Partitionen
      * @param partitions
