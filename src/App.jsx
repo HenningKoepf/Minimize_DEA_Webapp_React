@@ -475,14 +475,16 @@ function App() {
         }
 
         return (
-            <div className="partition-with-symbol" >
+            <div className="partition-with-symbol">
                 {historyEntry.partitions.map((partition, partitionIndex) => (
                     <span key={partitionIndex}>
-                    {partition.map(node => node.id).join(" ")} {partitionIndex < historyEntry.partitions.length - 1 ? " |  " : ""}
-                </span>
+            {'{' + partition.map(node => node.id).join(", ") + '}'}
+                        {partitionIndex < historyEntry.partitions.length - 1 ? " | " : ""}
+        </span>
                 ))}
                 {historyEntry.symbol && <span className="symbol"> mit "{historyEntry.symbol}"</span>}
             </div>
+
         );
     }
 
@@ -782,7 +784,7 @@ const getEnhancedEdges = useCallback(() => {
                     {partitionsHistory.map((historyEntry, index) => (
                         <div key={index}
                              >
-                            <div className="step-number" >{index+1}.Schritt:</div>
+                            <div className="step-number" >{index+1}. Schritt:</div>
                             <br/>
                             {renderPartitionWithSymbol(historyEntry)}
 

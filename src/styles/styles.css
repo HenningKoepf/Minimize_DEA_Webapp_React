@@ -262,8 +262,8 @@ Anzeige der bisherigen Partitionen scrollbar
   margin-top: 0;
   padding-top: 10px;
   overflow-y: scroll;
-  max-height: 140px;
-  width: 95%;
+  max-height: 340px;
+
   margin-left: 5px;
 }
 

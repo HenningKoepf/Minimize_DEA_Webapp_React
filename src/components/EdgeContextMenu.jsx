@@ -63,13 +63,13 @@ export default function EdgeContextMenu({
     const handleMouseEnter = useCallback((symbol) => {
 
         setHighlightedPartition(prev => edge.source); // Setze die Partition basierend auf der Quelle der Kante
-        setHighlightHoverSymbol(symbol);  // Setze das hervorzuhebende Symbol
+        setHighlightHoverSymbol(prev => symbol);  // Setze das hervorzuhebende Symbol
     }, [partitions, edge, setHighlightedPartition, setHighlightHoverSymbol]);
 
     const handleMouseLeave = useCallback(() => {
         setHighlightedPartition(prev => null);
 
-        setHighlightHoverSymbol( null);
+        setHighlightHoverSymbol( prev => null);
     }, [setHighlightedPartition, setHighlightHoverSymbol]);
 
 
