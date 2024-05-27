@@ -84,7 +84,11 @@ function App() {
     const [finaledges, setfinalEdges, onfinalEdgesChange] = useEdgesState([]);
 
     //States für Hovering
-    const [hoverIndex, setHoverIndex] = useState(null);
+
+    const [highlightHoverSymbol, setHighlightHoverSymbol] = useState(null);
+    const [highlightedPartition, setHighlightedPartition] = useState(null);
+
+
 
     //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen  initialisiert.
     useEffect(() => {
@@ -111,6 +115,10 @@ function App() {
     const onPaneClick = useCallback(() => {
         setMenu(null); // Set das Menu zurück
         setEdgeMenu(null); // Setz das edgeMenu zurück
+        setHighlightHoverSymbol(null)
+
+        setHighlightedPartition(null);  // Reset wenn Komponente abgemountet wird
+
     }, [setMenu, setEdgeMenu]);
 
 
@@ -138,8 +146,12 @@ function App() {
                 const left = Math.min(clickX- kontrollContainerWidth , pane.width - kontrollContainerWidth - 200);
                 // limit die linke Position mit Breite des Kontrollcontainer
                 const top = Math.min(clickY -topTextHeight, pane.height -topTextHeight - 200);
+                //hover enhanced
 
-            setEdgeMenu({
+
+
+                setEdgeMenu({
+                    className:"context-menu",
                 id: edge.id,
                 top: top,
                 left: left,
@@ -150,9 +162,15 @@ function App() {
                 edges: edges,
                 partitionDFAWithEdge: partitionDFAWithEdge,
                 setPartitions: setPartitions,
+                setHighlightHoverSymbol: setHighlightHoverSymbol,
+                highlightHoverSymbol: highlightHoverSymbol,
+                    setHighlightedPartition: setHighlightedPartition,
+                    highlightedPartition: highlightedPartition,
             });
+
+
         },
-        [setEdgeMenu, edges, nodes, partitions],
+        [setEdgeMenu, edges, nodes, partitions, highlightHoverSymbol , highlightedPartition],
     );
 
     /**
@@ -460,7 +478,7 @@ function App() {
             <div className="partition-with-symbol" >
                 {historyEntry.partitions.map((partition, partitionIndex) => (
                     <span key={partitionIndex}>
-                    {partition.map(node => node.id).join(" ")} {partitionIndex < historyEntry.partitions.length - 1 ? "| " : ""}
+                    {partition.map(node => node.id).join(" ")} {partitionIndex < historyEntry.partitions.length - 1 ? " |  " : ""}
                 </span>
                 ))}
                 {historyEntry.symbol && <span className="symbol"> mit "{historyEntry.symbol}"</span>}
@@ -601,13 +619,21 @@ function App() {
      */
 
         //
-    const getEnhancedEdges = useCallback(() => {
-            return finaledges.map(edge => {
+    /*
 
-                // sollte die Kante highlighted werden?
-                const shouldHighlight = hoverIndex !== null && edge.label.split(/[,;\s]\s*/).some(
-                    symbol => partitionsHistory[hoverIndex]?.symbol.includes(symbol)
+const getEnhancedEdges = useCallback(() => {
+       return finaledges.map(edge => {
+
+           // sollte die Kante highlighted werden?
+
+           const shouldHighlight = hoverIndex !== null && (
+               edge.label.split(/[,;\s]\s).some(
+//es fehlt noch "* /" bei den splits
+                        symbol => partitionsHistory[hoverIndex]?.symbol.includes(symbol)
+                    ) || edge.label.includes(highlightHoverSymbol)
                 );
+
+                //hier extra highlight vom menü
 
                 return {
                     ...edge,
@@ -618,7 +644,30 @@ function App() {
                     }
                 };
             });
-        }, [finaledges, hoverIndex, partitionsHistory]);
+        }, [finaledges, hoverIndex, partitionsHistory,highlightHoverSymbol]);
+
+     */
+    const getEnhancedEdges = useCallback(() => {
+        return finaledges.map(edge => {
+
+            const sourceNode = finalnodes.find(node => node.id === edge.source);
+
+
+            const shouldHighlight = sourceNode && sourceNode.data.label.includes(highlightedPartition) && edge.label.includes(highlightHoverSymbol)
+
+
+
+            return {
+                ...edge,
+                style: {
+                    ...edge.style,
+                    strokeWidth: shouldHighlight ? 2 : 1,
+                    stroke: shouldHighlight ? 'red' : '#b1b1b7'
+                }
+            };
+        });
+    }, [finaledges, highlightHoverSymbol, highlightedPartition, partitions]);
+
 
     return (
       <>
@@ -705,7 +754,7 @@ function App() {
                       nodesDraggable={false}
                       nodesConnectable={false}
                       elementsSelectable={false}
-                      paneMoveable={false}
+                      panemoveable={false}
                       zoomOnScroll={false}
                       zoomOnDoubleClick={false}
                   >
@@ -732,9 +781,7 @@ function App() {
                 <div className="partition-history">
                     {partitionsHistory.map((historyEntry, index) => (
                         <div key={index}
-                             className={"history-entry" + (hoverIndex === index ? " hover" : "")}
-                             onMouseEnter={() => setHoverIndex(index)}
-                             onMouseLeave={() => setHoverIndex(null)}>
+                             >
                             <div className="step-number" >{index+1}.Schritt:</div>
                             <br/>
                             {renderPartitionWithSymbol(historyEntry)}

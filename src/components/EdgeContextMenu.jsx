@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import { useReactFlow } from 'reactflow';
 
 
@@ -12,6 +12,11 @@ export default function EdgeContextMenu({
                                             partitions,
                                             edges,
                                             setPartitions,
+                                            highlightHoverSymbol,
+                                            setHighlightHoverSymbol,
+                                            highlightedPartition,
+                                            setHighlightedPartition,
+
                                             ...props
                                         }) {
     const { getEdge, setEdges } = useReactFlow();
@@ -47,13 +52,25 @@ export default function EdgeContextMenu({
     }, [id,setEdges]);
 
     const initiatePartitioning = useCallback((selectedSymbol) => {
-        const selectedEdge = getEdge(id);  // Assume getEdge is a method to get edge details
+        const selectedEdge = getEdge(id);
         if (selectedEdge) {
 
             partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol);
 
         }
     }, [id, getEdge, partitionDFAWithEdge, partitions, edges]);
+
+    const handleMouseEnter = useCallback((symbol) => {
+
+        setHighlightedPartition(prev => edge.source); // Setze die Partition basierend auf der Quelle der Kante
+        setHighlightHoverSymbol(symbol);  // Setze das hervorzuhebende Symbol
+    }, [partitions, edge, setHighlightedPartition, setHighlightHoverSymbol]);
+
+    const handleMouseLeave = useCallback(() => {
+        setHighlightedPartition(prev => null);
+
+        setHighlightHoverSymbol( null);
+    }, [setHighlightedPartition, setHighlightHoverSymbol]);
 
 
 
@@ -69,7 +86,10 @@ export default function EdgeContextMenu({
             </p>
 
             {symbols.map((symbol, index) => (
-                <button key={index} onClick={() => initiatePartitioning(symbol)}>
+                <button key={index}
+                        onClick={() => initiatePartitioning(symbol) }
+                        onMouseEnter={() => handleMouseEnter(symbol)}
+                        onMouseLeave={handleMouseLeave}>
                     Prüfe Zeichen: {symbol}
                 </button>
             ))}
