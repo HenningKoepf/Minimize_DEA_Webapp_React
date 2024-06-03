@@ -741,12 +741,11 @@ const getEnhancedEdges = useCallback(() => {
 
             <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
 
-                  <div className="finalFlowrenderer" style={{ height: '65vh', width: '43%' }}>
+                  <div className="finalFlowrenderer" style={{ height: '65vh', width: '55%' }}>
                   {partitions && isDfaResult &&(
                   <ReactFlow
                       ref={refFinal}
                       nodes={finalnodes}
-
                       edges={getEnhancedEdges()}
                       onNodesChange={onfinalNodesChange}
                       onEdgesChange={onfinalEdgesChange}

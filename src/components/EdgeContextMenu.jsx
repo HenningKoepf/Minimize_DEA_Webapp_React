@@ -82,7 +82,7 @@ export default function EdgeContextMenu({
             {...props}
         >
             <p style={{ margin: '0.5em' }}>
-                <small>Edge: {id}</small>
+                <small>Kante: {id}</small>
             </p>
 
             {symbols.map((symbol, index) => (
@@ -90,11 +90,11 @@ export default function EdgeContextMenu({
                         onClick={() => initiatePartitioning(symbol) }
                         onMouseEnter={() => handleMouseEnter(symbol)}
                         onMouseLeave={handleMouseLeave}>
-                    Prüfe Zeichen: {symbol}
+                    Prüfe auf Symbol: {symbol}
                 </button>
             ))}
 
-            <button onClick ={deleteEdge}>Kante Löschen</button>
+            <button onClick ={deleteEdge}>Löschen</button>
             <button onClick ={renameEdge}>Umbenennen</button>
 
 

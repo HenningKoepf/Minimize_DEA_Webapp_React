@@ -209,7 +209,7 @@ export default function NodeContextMenu({
       {...props}
     >
       <p style={{ margin: '0.5em' }}>
-        <small>node: {id}</small>
+        <small>Zustand: {id}</small>
       </p>
       <button onClick={duplicateNode}>Neuer Zustand </button>
       <button onClick={deleteNode}>Zustand Löschen</button>
