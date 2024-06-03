@@ -226,6 +226,15 @@ Dicker Rand für Endzustand
   margin-left: 5px;
   border: none;
 }
+.Kontrollcontainer .IfMinimizedDFA {
+  margin-top: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 5px;
+  border: none;
+}
 
 .Kontrollcontainer .DFAAnzeige.true {
   background-color: #28a745; /* Grün für "Ja" */
@@ -237,15 +246,34 @@ Dicker Rand für Endzustand
   color: black;
 }
 
+.Kontrollcontainer .IfMinimizedDFA.false{
+  background-color: #dc3545; /* Rot für "Nein" */
+  color: black;
+}
+
+.Kontrollcontainer .IfMinimizedDFA.true {
+  background-color: #28a745; /* Grün für "Ja" */
+  color: black;
+}
+
 
 .DFAContainer {
   display: flex;
-  align-items: center; /* Zentriert die Inhalte vertikal */
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 
 /* Stil für True */
 .DFAAnzeige.true {
+  color: green;
+}
+
+/* Stil für False */
+.IfMinimizedDFA.false {
+  color: red;
+}
+.IfMinimizedDFA.true {
   color: green;
 }
 

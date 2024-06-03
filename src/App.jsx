@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -87,6 +87,9 @@ function App() {
 
     const [highlightHoverSymbol, setHighlightHoverSymbol] = useState(null);
     const [highlightedPartition, setHighlightedPartition] = useState(null);
+
+    //States für MinimizedFinishedCheck
+    const[isMinimized, setIsMinimized] = useState (false);
 
 
 
@@ -488,6 +491,95 @@ function App() {
         );
     }
 
+    /** Prüfen ob der Automat schon minimal is
+     *
+     */
+    function refinePartitions(partitions, edges) {
+        let currentPartitions = partitions;
+
+        alphabet.forEach(symbol => {
+            let newPartitions = [];
+
+            currentPartitions.forEach(partition => {
+                let partitionMap = new Map();
+
+                // Durchlaufe jeden Zustand in der aktuellen Partition
+                partition.forEach(node => {
+                    // Finde den Zielzustand für den aktuellen Knoten und das spezifische Symbol
+                    const target = findTargetState(node, symbol, edges);
+
+                    // Finde die Partition, zu der der Zielzustand gehört
+                    const targetPartition = target ? findPartitionForState(target, currentPartitions) : null;
+
+                    // Schlüssel basierend auf dem Zielzustand und der Partition, Müllzustände sind wichtig und bekommen eigenen Key
+                    let key = targetPartition ? currentPartitions.indexOf(targetPartition).toString() : 'none';
+
+                    // Gruppiere Knoten basierend auf ihrem Zielzustand
+                    if (!partitionMap.has(key)) {
+                        partitionMap.set(key, []);
+                    }
+                    partitionMap.get(key).push(node);
+                });
+
+                // Füge die neu gebildeten Partitionen der Liste der neuen Partitionen hinzu
+                partitionMap.forEach(group => {
+                    if (group.length > 0) {
+                        newPartitions.push(group);
+                    }
+                });
+            });
+
+            // Aktualisiere die aktuellen Partitionen für das nächste Symbol
+            currentPartitions = newPartitions;
+        });
+
+        // Loope jede Partition
+        return currentPartitions;
+    }
+
+
+
+
+
+
+
+    /** Prüft ob zwei Partitionen identisch sind
+     *
+     * @param partitions1
+     * @param partitions2
+     * @returns {boolean}
+     */
+    function comparePartitions(partitions1, partitions2) {
+        if (partitions1.length !== partitions2.length) {
+            return false;
+        }
+
+        const sortedPartitions1 = partitions1.map(partition =>
+            partition.map(node => node.id).sort()
+        ).sort((a, b) => a[0].localeCompare(b[0]));
+
+        const sortedPartitions2 = partitions2.map(partition =>
+            partition.map(node => node.id).sort()
+        ).sort((a, b) => a[0].localeCompare(b[0]));
+
+        for (let i = 0; i < sortedPartitions1.length; i++) {
+            if (sortedPartitions1[i].join() !== sortedPartitions2[i].join()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    const checkIfMinimizedDFA = () => {
+        let minimizedCheckPartitions = partitions; // Start mit den initialen Partitionen
+            minimizedCheckPartitions = refinePartitions(partitions, edges);
+
+
+        setIsMinimized( comparePartitions(partitions, minimizedCheckPartitions));
+    };
+
 
     /**
      * Kreation des Äquivalenzautomaten basierend auf den aktuellen Partitionen
@@ -496,7 +588,10 @@ function App() {
      */
     useEffect(() => {
         createMinimizedGraph();
+        setIsMinimized(null);
+
     }, [partitions]); // Abhängigkeit von der existenz der Partitionen
+
 
     const createMinimizedGraph = () => {
         const newNodes = [];
@@ -697,7 +792,7 @@ const getEnhancedEdges = useCallback(() => {
                   <button onClick={resetPage} style={{ marginRight: '20px' }}> Reload</button>
                       <button onClick={plainField}> Beispiel </button>
                       <div>
-                      <label className={implyTrashStates}>
+                      <label className={implyTrashStates} style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
                           Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates}/>
                       </label>
                   </div>
@@ -707,13 +802,15 @@ const getEnhancedEdges = useCallback(() => {
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
-                  </div>
-                  <div className="partitionen">
-                      {partitions.map((partition, index) =>
-                          partition.map(node => node.data.label).join("  ") + (index < partitions.length - 1 ? " | " : "")
+                      {isDfaResult === true && (
+                          <>
+                              <button onClick={checkIfMinimizedDFA}>Ist der DFA minimal?</button>
+                              <div className={`IfMinimizedDFA ${isMinimized !== null ? (isMinimized ? 'true' : 'false') : ''}`}>
+                                  {isMinimized !== null && (<div>{isMinimized ? 'Ja' : 'Nein'}</div>)}
+                              </div>
+                          </>
                       )}
                   </div>
-
 
           </div>
               <div className="reactFlowsContainer" style={{ height: '140vh', width: '90%', marginBottom: '20px' }}>
