@@ -3,6 +3,8 @@ import { useReactFlow } from 'reactflow';
 
 
 
+
+
 export const initialPartition = (nodes) => {
     const endStates = nodes.filter(node => node.data.output);
     const nonEndStates = nodes.filter(node => !node.data.output);
@@ -101,7 +103,8 @@ function refinePartitions(partitions, edges, symbol) {
 
 
 
-const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setPartitions,triggerCalculation, setTriggerCalculation, setPartitionsHistory, partitionHistory }) => {
+const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setPartitions,triggerCalculation,
+                         setTriggerCalculation, setPartitionsHistory, partitionHistory ,setIsDFAMinimized}) => {
 
     let history = [{symbol: 'Start', partitions: partitions}];
     const handleCalculateClick = () => {
@@ -134,6 +137,7 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
 
             refineAllPartitions().catch(console.error);
             setTriggerCalculation(false); // Setz Trigger zurück
+            setIsDFAMinimized(true);
         }
     }, [triggerCalculation]);
 

@@ -89,7 +89,7 @@ function App() {
     const [highlightedPartition, setHighlightedPartition] = useState(null);
 
     //States für MinimizedFinishedCheck
-    const[isMinimized, setIsMinimized] = useState (false);
+    const[isDFAMinimized, setIsDFAMinimized] = useState (false);
 
 
 
@@ -376,7 +376,7 @@ function App() {
      * @param selectedEdge
      * @returns {{partitions: *[], changed: boolean}}
      */
-        const history = [{symbol: 'Start', partitions: partitions}];
+
     function partitionDFAWithEdge(partitions, edges, selectedEdge,selectedSymbol) {
 
         let newPartitions = [];
@@ -577,7 +577,7 @@ function App() {
             minimizedCheckPartitions = refinePartitions(partitions, edges);
 
 
-        setIsMinimized( comparePartitions(partitions, minimizedCheckPartitions));
+        setIsDFAMinimized( comparePartitions(partitions, minimizedCheckPartitions));
     };
 
 
@@ -588,7 +588,7 @@ function App() {
      */
     useEffect(() => {
         createMinimizedGraph();
-        setIsMinimized(null);
+        setIsDFAMinimized(null);
 
     }, [partitions]); // Abhängigkeit von der existenz der Partitionen
 
@@ -805,8 +805,8 @@ const getEnhancedEdges = useCallback(() => {
                       {isDfaResult === true && (
                           <>
                               <button onClick={checkIfMinimizedDFA}>Ist der DFA minimal?</button>
-                              <div className={`IfMinimizedDFA ${isMinimized !== null ? (isMinimized ? 'true' : 'false') : ''}`}>
-                                  {isMinimized !== null && (<div>{isMinimized ? 'Ja' : 'Nein'}</div>)}
+                              <div className={`IfMinimizedDFA ${isDFAMinimized !== null ? (isDFAMinimized ? 'true' : 'false') : ''}`}>
+                                  {isDFAMinimized !== null && (<div>{isDFAMinimized ? 'Ja' : 'Nein'}</div>)}
                               </div>
                           </>
                       )}
@@ -852,7 +852,7 @@ const getEnhancedEdges = useCallback(() => {
                       nodesDraggable={false}
                       nodesConnectable={false}
                       elementsSelectable={false}
-                      panemoveable={false}
+
                       zoomOnScroll={false}
                       zoomOnDoubleClick={false}
                   >
@@ -868,12 +868,13 @@ const getEnhancedEdges = useCallback(() => {
                     nodes={nodes}
                     edges={edges}
                     alphabet={alphabet}
-                    partitions={partitions}
+                    partitions={initialPartition(nodes)}
                     setPartitions={setPartitions}
                     triggerCalculation={triggerCalculation}
                     setTriggerCalculation={setTriggerCalculation}
                     partitionsHistory={partitionsHistory}
                     setPartitionsHistory={setPartitionsHistory}
+                    setIsDFAMinimized={setIsDFAMinimized}
                 />
 
                 <div className="partition-history">
