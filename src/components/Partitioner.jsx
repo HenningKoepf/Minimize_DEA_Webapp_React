@@ -148,7 +148,7 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
     } else {
         return (
             <>
-                <button onClick={handleCalculateClick}> Berechnung automatisch durchführen</button>
+                <button onClick={handleCalculateClick} style={{ width: "250px" }}> Berechnung automatisch durchführen</button>
                 <h2> Zustandsklassen </h2>
             </>
         );

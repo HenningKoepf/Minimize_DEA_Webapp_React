@@ -26,6 +26,7 @@ import BaseNode from './elements/BaseNode';
 import {initialNodes, initialEdges} from './elements/initial-setup2';
 import {initialNode, noEdges} from './elements/ClearBoard';
 import {exampleNodes, exampleEdges} from './elements/exampleDFA';
+import {miniNodes, miniEdges} from './elements/mini-setup';
 import Partitioner from './components/Partitioner';
 import {findPartitionForState, findTargetState} from './components/Partitioner';
 
@@ -63,11 +64,19 @@ function App() {
         setImplyTrashStates(!implyTrashStates);
     };
 
+    // Beispiel 1
     const plainField = () => {
 
         setNodes(prev => exampleNodes);
         setEdges(prev => exampleEdges);
         setAlphabet(['a', 'b', 'c']);
+    }
+    //minimalKonfiguration als Start
+    const miniField = () => {
+
+        setNodes(prev => miniNodes);
+        setEdges(prev => miniEdges);
+        setAlphabet(['a']);
     }
 
     //Erzeut die Startpartitionen mit Endzuständen und restlichen Zuständen
@@ -772,7 +781,7 @@ const getEnhancedEdges = useCallback(() => {
 
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
-                  <legend><strong>Eingabe: </strong></legend>
+                  <h3 className ="aktuelleKonfiguration"> Konfiguration des Automaten:</h3>
                   <div>
                       <label>Alphabet bearbeiten:</label>
                       <input className= "inputAlphabet"
@@ -780,7 +789,7 @@ const getEnhancedEdges = useCallback(() => {
                           value={inputAlphabet}
                           onInput={(e) => {handleAlphabetInput(e)}}/>
                   </div>
-                      <div className ="aktuelleKonfiguration">  Aktuelle Konfiguration:</div>
+
                       <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
                       <div className="zustände">{`Z = {${nodes.map((node) => node.data.label).join(",  ")}}`}</div>
                           <div className="zustände">
@@ -789,8 +798,9 @@ const getEnhancedEdges = useCallback(() => {
 
                       <NodeLabelList nodes={nodes} edges = {edges}/>
                   <div>
-                  <button onClick={resetPage} style={{ marginRight: '20px' }}> Reload</button>
-                      <button onClick={plainField}> Beispiel </button>
+                      <button onClick={miniField} style={{ marginRight: '10px' }}> Reset</button>
+                  <button onClick={resetPage} style={{ marginRight: '10px' }}> Beispiel 1</button>
+                      <button onClick={plainField}> Beispiel 2</button>
                       <div>
                       <label className={implyTrashStates} style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
                           Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates}/>
@@ -798,19 +808,20 @@ const getEnhancedEdges = useCallback(() => {
                   </div>
               </div>
                   <div className="DFAContainer">
-                      <button onClick={checkIsDFA}>Ist das ein DFA?</button>
+                      <button onClick={checkIsDFA}>Ist das Original ein DFA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
                       {isDfaResult === true && (
                           <>
-                              <button onClick={checkIfMinimizedDFA}>Ist der DFA minimal?</button>
+                              <button onClick={checkIfMinimizedDFA}>Ist der erzeugte Automat minimal?</button>
                               <div className={`IfMinimizedDFA ${isDFAMinimized !== null ? (isDFAMinimized ? 'true' : 'false') : ''}`}>
                                   {isDFAMinimized !== null && (<div>{isDFAMinimized ? 'Ja' : 'Nein'}</div>)}
                               </div>
                           </>
                       )}
                   </div>
+
 
           </div>
               <div className="reactFlowsContainer" style={{ height: '140vh', width: '90%', marginBottom: '20px' }}>
@@ -838,8 +849,18 @@ const getEnhancedEdges = useCallback(() => {
 
             <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
 
-                  <div className="finalFlowrenderer" style={{ height: '65vh', width: '55%' }}>
+
+                  <div className="finalFlowrenderer" style={{ height: '80vh', width: '95%' }}>
+
                   {partitions && isDfaResult &&(
+                      <>
+                      <h2 className="header">
+                          {isDFAMinimized ? (
+                              <>Minimierter Automat:</>
+                          ) : (
+                              <>Erzeugter Automat:</>
+                          )}
+                      </h2>
                   <ReactFlow
                       ref={refFinal}
                       nodes={finalnodes}
@@ -860,35 +881,39 @@ const getEnhancedEdges = useCallback(() => {
                           showZoom = {false}
                           showInteractive ={false}/>
                   </ReactFlow>
+                      </>
+
+
                   )}
+
                  </div>
-                <div className= "partitiondiv" style={{ display: 'flex', flexDirection: 'column' , padding: '20px'}}>
-                <Partitioner
-                    isDfaResult={isDfaResult}
-                    nodes={nodes}
-                    edges={edges}
-                    alphabet={alphabet}
-                    partitions={initialPartition(nodes)}
-                    setPartitions={setPartitions}
-                    triggerCalculation={triggerCalculation}
-                    setTriggerCalculation={setTriggerCalculation}
-                    partitionsHistory={partitionsHistory}
-                    setPartitionsHistory={setPartitionsHistory}
-                    setIsDFAMinimized={setIsDFAMinimized}
-                />
+                <div className= "partitiondiv" style={{height:'40vh', width:'85%', display: 'flex', flexDirection: 'column' , padding: '20px'}}>
+                    <Partitioner
+                        isDfaResult={isDfaResult}
+                        nodes={nodes}
+                        edges={edges}
+                        alphabet={alphabet}
+                        partitions={initialPartition(nodes)}
+                        setPartitions={setPartitions}
+                        triggerCalculation={triggerCalculation}
+                        setTriggerCalculation={setTriggerCalculation}
+                        partitionsHistory={partitionsHistory}
+                        setPartitionsHistory={setPartitionsHistory}
+                        setIsDFAMinimized={setIsDFAMinimized}
+                    />
 
-                <div className="partition-history">
-                    {partitionsHistory.map((historyEntry, index) => (
-                        <div key={index}
-                             >
-                            <div className="step-number" >{index+1}. Schritt:</div>
-                            <br/>
-                            {renderPartitionWithSymbol(historyEntry)}
+                    <div className="partition-history">
+                        {partitionsHistory.map((historyEntry, index) => (
+                            <div key={index}
+                            >
+                                <div className="step-number" >{index+1}. Schritt:</div>
+                                <br/>
+                                {renderPartitionWithSymbol(historyEntry)}
 
-                            <div style={{ height: '20px' }}></div>
-                        </div>
-                    ))}
-                </div>
+                                <div style={{ height: '20px' }}></div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
               </div>
 
