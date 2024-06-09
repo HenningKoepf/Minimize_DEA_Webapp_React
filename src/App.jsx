@@ -100,6 +100,17 @@ function App() {
     //States für MinimizedFinishedCheck
     const[isDFAMinimized, setIsDFAMinimized] = useState (false);
 
+    /**
+     * das Alphabet soll automatisch aktualisiert werden, sobald neue symbole hinzukommen!
+     */
+    useEffect(() => {
+        const symbols = new Set();
+        edges.forEach(edge => {
+            const edgeSymbols = edge.label.split(/[,;\s]\s*/).map(symbol => symbol.trim());
+            edgeSymbols.forEach(symbol => symbols.add(symbol));
+        });
+        setAlphabet(Array.from(symbols));
+    }, [edges]);
 
 
     //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen  initialisiert.
@@ -782,6 +793,7 @@ const getEnhancedEdges = useCallback(() => {
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
                   <h3 className ="aktuelleKonfiguration"> Konfiguration des Automaten:</h3>
+                  {/*
                   <div>
                       <label>Alphabet bearbeiten:</label>
                       <input className= "inputAlphabet"
@@ -789,6 +801,7 @@ const getEnhancedEdges = useCallback(() => {
                           value={inputAlphabet}
                           onInput={(e) => {handleAlphabetInput(e)}}/>
                   </div>
+                  */}
 
                       <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
                       <div className="zustände">{`Z = {${nodes.map((node) => node.data.label).join(",  ")}}`}</div>
