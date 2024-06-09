@@ -388,3 +388,24 @@ Anzeige der bisherigen Partitionen scrollbar
 .step-number {
   padding-right: 10px; /* Abstand vor der Schritt-Nummer */
 }
+
+/* Styles für den Input pfeil*/
+.input-arrow {
+  position: absolute;
+  left: -20px;
+  top: 50%; /* vl noch position anpassen*/
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+}
+
+.input-arrow::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 10px solid black;
+}
+

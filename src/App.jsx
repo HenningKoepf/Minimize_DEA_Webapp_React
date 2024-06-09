@@ -765,6 +765,14 @@ function App() {
         return averagePosition;
     }
 
+    const NodeWithArrow = ({ id, data, position, style, targetPosition, sourcePosition }) => (
+        <div className="react-flow__node-default" style={{ ...style, position: 'absolute', left: position.x, top: position.y }}>
+            {data.input && <div className="input-arrow"></div>}
+            {data.label}
+        </div>
+    );
+
+
     /**
      *  dynamisches Stylen der Edges als enhance edges mit  hover-based styling
      */
@@ -803,10 +811,7 @@ const getEnhancedEdges = useCallback(() => {
 
             const sourceNode = finalnodes.find(node => node.id === edge.source);
 
-
             const shouldHighlight = sourceNode && sourceNode.data.label.includes(highlightedPartition) && edge.label.includes(highlightHoverSymbol)
-
-
 
             return {
                 ...edge,
@@ -814,7 +819,9 @@ const getEnhancedEdges = useCallback(() => {
                     ...edge.style,
                     strokeWidth: shouldHighlight ? 2 : 1,
                     stroke: shouldHighlight ? 'red' : '#b1b1b7'
-                }
+
+                },
+                markerEnd: { type: MarkerType.ArrowClosed },
             };
         });
     }, [finaledges, highlightHoverSymbol, highlightedPartition, partitions]);
