@@ -201,37 +201,71 @@ function App() {
      * Erzeugt
      * @type {(function(*): void)|*}
      */
-
     const onConnect = useCallback(
         (params) => {
-            if ( params.source === params.target){
-                const newEdge = {
-                    id: `edge-${params.source}-${params.target}`,
-                    source: params.source,
-                    target: params.target,
-                    label: "a",
-                    type: "selfconnecting",
-                    markerEnd: { type: MarkerType.ArrowClosed },
-                };
-                setEdges((edges) => [...edges, newEdge]);
+            const label = prompt("Bitte geben Sie das Label für die neue Kante ein:", "a");
+
+            if (label !== null) {
+                if (params.source === params.target) {
+                    const newEdge = {
+                        id: `edge-${params.source}-${params.target}`,
+                        source: params.source,
+                        target: params.target,
+                        label: label,
+                        type: "selfconnecting",
+                        markerEnd: { type: MarkerType.ArrowClosed },
+                    };
+                    setEdges((edges) => [...edges, newEdge]);
+                } else {
+                    const newEdge = {
+                        id: `edge-${params.source}-${params.target}`,
+                        source: params.source,
+                        target: params.target,
+                        label: label,
+                        type: "default",
+                        markerEnd: { type: MarkerType.ArrowClosed },
+                    };
+
+                    // Aktualisiere die Edge-Liste mit der zusätzlichen Kante
+                    setEdges((edges) => [...edges, newEdge]);
+                }
             }
-            else{
-
-                const newEdge = {
-                    id: `edge-${params.source}-${params.target}`,
-                    source: params.source,
-                    target: params.target,
-                    label:  "a",
-                    type: "default",
-                    markerEnd: { type: MarkerType.ArrowClosed },
-                };
-
-                // Aktualisiere die Edge-Liste mit der zusätzlichen Kante
-                setEdges((edges) => [...edges, newEdge]);
-             }
-            },
+        },
         [setEdges]
     );
+
+    /*
+        const onConnect = useCallback(
+            (params) => {
+                if ( params.source === params.target){
+                    const newEdge = {
+                        id: `edge-${params.source}-${params.target}`,
+                        source: params.source,
+                        target: params.target,
+                        label: "a",
+                        type: "selfconnecting",
+                        markerEnd: { type: MarkerType.ArrowClosed },
+                    };
+                    setEdges((edges) => [...edges, newEdge]);
+                }
+                else{
+
+                    const newEdge = {
+                        id: `edge-${params.source}-${params.target}`,
+                        source: params.source,
+                        target: params.target,
+                        label:  "a",
+                        type: "default",
+                        markerEnd: { type: MarkerType.ArrowClosed },
+                    };
+
+                    // Aktualisiere die Edge-Liste mit der zusätzlichen Kante
+                    setEdges((edges) => [...edges, newEdge]);
+                 }
+                },
+            [setEdges]
+        );
+        */
 
     /**
      * Öffnet das Kontextmenü der Knoten
@@ -793,7 +827,7 @@ const getEnhancedEdges = useCallback(() => {
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
                   <h3 className ="aktuelleKonfiguration"> Konfiguration des Automaten:</h3>
-                  {/*
+                  {/* auskommentiertes Eingabefeld für das Alphabet
                   <div>
                       <label>Alphabet bearbeiten:</label>
                       <input className= "inputAlphabet"

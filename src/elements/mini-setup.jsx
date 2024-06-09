@@ -36,6 +36,14 @@ export const miniEdges: Edge[] = [
         target: 'Z2',
         label: 'a',
         markerEnd: { type: MarkerType.ArrowClosed }
+    },
+    {
+        id: 'edge-Z2-Z2',
+        source: 'Z2',
+        target: 'Z2',
+        type: 'selfconnecting',
+        label: 'a',
+        markerEnd: { type: MarkerType.ArrowClosed }
     }
 
 ];
