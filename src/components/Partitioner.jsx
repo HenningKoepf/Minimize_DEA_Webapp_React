@@ -1,9 +1,7 @@
+
 import React, { useEffect, useState } from 'react';
+
 import { useReactFlow } from 'reactflow';
-
-
-
-
 
 export const initialPartition = (nodes) => {
     const endStates = nodes.filter(node => node.data.output);
@@ -63,7 +61,7 @@ const formatPartitions = (partitions) => {
  * @param alphabet
  * @returns {[*,*]}
  */
-
+/*
 function refinePartitions(partitions, edges, symbol) {
     let newPartitions = [];
 
@@ -100,7 +98,49 @@ function refinePartitions(partitions, edges, symbol) {
     return newPartitions;
 }
 
+*/
+function refinePartitions(partitions, edges, alphabet) {
+    let currentPartitions = partitions;
 
+    alphabet.forEach(symbol => {
+        let newPartitions = [];
+
+        currentPartitions.forEach(partition => {
+            let partitionMap = new Map();
+
+            // Durchlaufe jeden Zustand in der aktuellen Partition
+            partition.forEach(node => {
+                // Finde den Zielzustand für den aktuellen Knoten und das spezifische Symbol
+                const target = findTargetState(node, symbol, edges);
+
+                // Finde die Partition, zu der der Zielzustand gehört
+                const targetPartition = target ? findPartitionForState(target, currentPartitions) : null;
+
+                // Schlüssel basierend auf dem Zielzustand und der Partition, Müllzustände sind wichtig und bekommen eigenen Key
+                let key = targetPartition ? currentPartitions.indexOf(targetPartition).toString() : 'none';
+
+                // Gruppiere Knoten basierend auf ihrem Zielzustand
+                if (!partitionMap.has(key)) {
+                    partitionMap.set(key, []);
+                }
+                partitionMap.get(key).push(node);
+            });
+
+            // Füge die neu gebildeten Partitionen der Liste der neuen Partitionen hinzu
+            partitionMap.forEach(group => {
+                if (group.length > 0) {
+                    newPartitions.push(group);
+                }
+            });
+        });
+
+        // Aktualisiere die aktuellen Partitionen für das nächste Symbol
+        currentPartitions = newPartitions;
+    });
+
+    // Loope jede Partition
+    return currentPartitions;
+}
 
 
 const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setPartitions,triggerCalculation,
@@ -122,7 +162,7 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
 
                 for (const symbol of alphabet) {
                     //auf die neuen Partitions warten damit wir die schleife nicht übel oft durchlaufen müssen
-                    const refinedPartitions = await refinePartitions(currentPartitions, edges, symbol);
+                    const refinedPartitions = await refinePartitions(currentPartitions, edges, alphabet);
                     //Historylogg
                     history.push({symbol: symbol, partitions: refinedPartitions});
                     // für nöchstes zeichen

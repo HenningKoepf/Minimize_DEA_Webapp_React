@@ -84,6 +84,13 @@ export const initialEdges: Edge[] = [
         markerEnd: { type: MarkerType.ArrowClosed },
     },
     {
+        id: 'edge-Z2-Z3',
+        source: 'Z2',
+        target: 'Z3',
+        label: 'a',
+        markerEnd: { type: MarkerType.ArrowClosed },
+    },
+    {
         id: 'edge-Z5-Z5',
         label: 'a, b' ,
         source: 'Z5',

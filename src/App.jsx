@@ -24,6 +24,7 @@ import BaseNode from './elements/BaseNode';
 
 
 import {initialNodes, initialEdges} from './elements/initial-setup2';
+import {initialNodes3, initialEdges3} from './elements/initial-setup3';
 import {initialNode, noEdges} from './elements/ClearBoard';
 import {exampleNodes, exampleEdges} from './elements/exampleDFA';
 import {miniNodes, miniEdges} from './elements/mini-setup';
@@ -77,6 +78,14 @@ function App() {
         setNodes(prev => miniNodes);
         setEdges(prev => miniEdges);
         setAlphabet(['a']);
+    }
+
+    //beispiel 3
+
+    const exampleField3 = () => {
+        setNodes(prev => initialNodes3);
+        setEdges(prev => initialEdges3);
+
     }
 
     //Erzeut die Startpartitionen mit Endzuständen und restlichen Zuständen
@@ -203,7 +212,7 @@ function App() {
      */
     const onConnect = useCallback(
         (params) => {
-            const label = prompt("Bitte geben Sie das Label für die neue Kante ein:", "a");
+            const label = prompt("Bitte geben Sie das Label für die neue Kante ein:", alphabet[0]);
 
             if (label !== null) {
                 if (params.source === params.target) {
@@ -855,6 +864,7 @@ const getEnhancedEdges = useCallback(() => {
                       <button onClick={miniField} style={{ marginRight: '10px' }}> Reset</button>
                   <button onClick={resetPage} style={{ marginRight: '10px' }}> Beispiel 1</button>
                       <button onClick={plainField}> Beispiel 2</button>
+                      <button onClick={exampleField3} style={{ marginRight: '10px' }}> Beispiel 3</button>
                       <div>
                       <label className={implyTrashStates} style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
                           Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates}/>
