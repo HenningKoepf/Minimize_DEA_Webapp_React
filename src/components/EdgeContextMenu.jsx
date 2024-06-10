@@ -16,6 +16,7 @@ export default function EdgeContextMenu({
                                             setHighlightHoverSymbol,
                                             highlightedPartition,
                                             setHighlightedPartition,
+                                            isDfaResult,
 
                                             ...props
                                         }) {
@@ -83,17 +84,23 @@ export default function EdgeContextMenu({
                 <small>Kante: {id}</small>
             </p>
 
-            {symbols.map((symbol, index) => (
-                <button key={index}
-                        onClick={() => initiatePartitioning(symbol) }
-                        onMouseEnter={() => handleMouseEnter(symbol)}
-                        onMouseLeave={handleMouseLeave}>
-                    Prüfe auf Symbol: {symbol}
-                </button>
-            ))}
+            {isDfaResult && (
+                <div> {/* Wrap buttons in a container for better layout */}
+                    {symbols.map((symbol, index) => (
+                        <button
+                            key={index}
+                            onClick={() => initiatePartitioning(symbol)}
+                            onMouseEnter={() => handleMouseEnter(symbol)}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            Prüfe auf Symbol: {symbol}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             <button onClick ={deleteEdge}>Löschen</button>
-            <button onClick ={renameEdge}>Umbenennen</button>
+            <button onClick ={renameEdge}>Symbol(e) ändern</button>
 
 
         </div>

@@ -49,7 +49,7 @@ function App() {
     //State Listener
     const [edgemenu, setEdgeMenu] = useState(null);
     const [menu, setMenu] = useState(null);
-    //const [nodeBg, setNodeBg] = useState('#eee');
+
     const [isDfaResult, setIsDfaResult, onChange] = useState(null);
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -215,11 +215,12 @@ function App() {
                 highlightHoverSymbol: highlightHoverSymbol,
                     setHighlightedPartition: setHighlightedPartition,
                     highlightedPartition: highlightedPartition,
+                isDfaResult: isDfaResult,
             });
 
 
         },
-        [setEdgeMenu, edges, nodes, partitions, highlightHoverSymbol , highlightedPartition],
+        [setEdgeMenu, edges, nodes, partitions, highlightHoverSymbol , highlightedPartition,isDfaResult],
     );
 
     /**
