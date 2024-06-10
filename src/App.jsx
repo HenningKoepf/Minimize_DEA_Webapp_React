@@ -571,10 +571,18 @@ function App() {
         });
 
         // Append to history with changes
-        setPartitionsHistory(prevHistory => [
-            ...prevHistory,
-            { symbol: selectedSymbol, partitions: newPartitions, changed, changes }
-        ]);
+        if(partitionsHistory.length > 0){
+            setPartitionsHistory(prevHistory => [
+                ...prevHistory,
+                { symbol: selectedSymbol, partitions: newPartitions, changed, changes }
+            ]);
+        }else{
+            setPartitionsHistory(prevHistory => [
+                ...prevHistory,
+                { symbol: 'Start', partitions: partitions, changed: false },
+                { symbol: selectedSymbol, partitions: newPartitions, changed, changes }
+            ]);
+        }
 
         // Gib die neuen Partitionen und das Änderungsflag zurück
         setPartitions(newPartitions);
@@ -638,7 +646,7 @@ function App() {
         </span>
                 ))}
                 {historyEntry.symbol !== "Start" && (
-                    <span className="symbol"> mit <strong>{historyEntry.symbol}</strong></span>
+                    <span className="symbol"> mit {historyEntry.symbol}</span>
                 )}
             </div>
 
@@ -652,6 +660,7 @@ function App() {
      */
     function refinePartitions(partitions, edges) {
         let currentPartitions = partitions;
+
 
         alphabet.forEach(symbol => {
             let newPartitions = [];
@@ -950,7 +959,7 @@ const getEnhancedEdges = useCallback(() => {
                           </div>
 
                       <NodeLabelList nodes={nodes} edges = {edges}/>
-                  <div>
+                  <div className="examplebuttons">
                       <button onClick={miniField} style={{ marginRight: '10px' }}> Reset</button>
                   <button onClick={resetPage} style={{ marginRight: '10px' }}> Beispiel 1</button>
                       <button onClick={plainField} style={{ marginRight: '10px' }}> Beispiel 2</button>
@@ -1058,11 +1067,14 @@ const getEnhancedEdges = useCallback(() => {
 
                     <div className="partition-history">
                         {partitionsHistory.map((historyEntry, index) => (
-                            <div key={index}>
-                                <div className="step-number">
-                                    {historyEntry.changed ? `${index + 1}. Schritt (Aufteilung)` : `${index + 1}. Überprüfung`}
-                                </div>
+                            <div key={index} className="partitionHistoryColumn">
+                                {index > 0 && (
+                                    <div className="step-number">
+                                        {index}. {historyEntry.changed ? ` Aufteilung` : ` Überprüfung`} mit <strong>{historyEntry.symbol}</strong>
+                                    </div>
+                                )}
                                 <br/>
+                                {index === 0 && <><div className="step-number">Aufteilung in Zustände & Endzustände: </div> <br/> </>}
                                 {renderPartitionWithSymbol(historyEntry)}
                                 {historyEntry.changed && (
                                     <div>
@@ -1071,7 +1083,6 @@ const getEnhancedEdges = useCallback(() => {
                                         </button>
                                         {detailsVisibility[index] && (
                                             <div>
-                                                <strong>Konflikte:</strong>
                                                 <ul>
                                                     {historyEntry.changes.map((change, changeIndex) => {
                                                         const groupIds = change.group.map(node => node.id).join(', ');

@@ -408,4 +408,14 @@ Anzeige der bisherigen Partitionen scrollbar
   border-bottom: 5px solid transparent;
   border-right: 10px solid black;
 }
+.examplebuttons{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.partition-history .partitionHistoryColumn {
+  border: 1px solid #ccc; /* Farbe und Dicke des Rahmens anpassen */
+  padding: 10px; /* Abstand zwischen Rahmen und Inhalt */
+  margin-bottom: 10px; /* Abstand zwischen Elementen */
+}
 
