@@ -116,7 +116,7 @@ function refinePartitions(partitions, edges, alphabet) {
                 // Finde die Partition, zu der der Zielzustand gehört
                 const targetPartition = target ? findPartitionForState(target, currentPartitions) : null;
 
-                // Schlüssel basierend auf dem Zielzustand und der Partition, Müllzustände sind wichtig und bekommen eigenen Key
+                // Key für als Zielzustand und die Partition, Müllzustände sind wichtig und bekommen eigenen Key
                 let key = targetPartition ? currentPartitions.indexOf(targetPartition).toString() : 'none';
 
                 // Gruppiere Knoten basierend auf ihrem Zielzustand
@@ -148,17 +148,15 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
 
     let history = [{symbol: 'Start', partitions: partitions}];
     const handleCalculateClick = () => {
-        setTriggerCalculation(true); // Setzt den Trigger für die Berechnung
+        setTriggerCalculation(true); // löst den Trigger für die Berechnung
 
     };
 
     useEffect(() => {
         if (triggerCalculation && isDfaResult) {
 
-
             const refineAllPartitions = async () => {
                 let currentPartitions = partitions; // Start mit den initialen Partitionen
-
 
                 for (const symbol of alphabet) {
                     //auf die neuen Partitions warten damit wir die schleife nicht übel oft durchlaufen müssen

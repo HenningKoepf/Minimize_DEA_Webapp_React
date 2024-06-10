@@ -554,7 +554,8 @@ function App() {
         );
     }
 
-    /** Prüfen ob der Automat schon minimal is
+    /** Hilfsfunktion zum Prüfen ob der Automat schon minimal is, erzeugt ergebnis von automaticher berechnung für
+     * Vergleich mit aktuell erzeugtem Automaten
      *
      */
     function refinePartitions(partitions, edges) {
@@ -599,12 +600,6 @@ function App() {
         // Loope jede Partition
         return currentPartitions;
     }
-
-
-
-
-
-
 
     /** Prüft ob zwei Partitionen identisch sind
      *
@@ -863,7 +858,7 @@ const getEnhancedEdges = useCallback(() => {
                   <div>
                       <button onClick={miniField} style={{ marginRight: '10px' }}> Reset</button>
                   <button onClick={resetPage} style={{ marginRight: '10px' }}> Beispiel 1</button>
-                      <button onClick={plainField}> Beispiel 2</button>
+                      <button onClick={plainField} style={{ marginRight: '10px' }}> Beispiel 2</button>
                       <button onClick={exampleField3} style={{ marginRight: '10px' }}> Beispiel 3</button>
                       <div>
                       <label className={implyTrashStates} style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
@@ -872,7 +867,7 @@ const getEnhancedEdges = useCallback(() => {
                   </div>
               </div>
                   <div className="DFAContainer">
-                      <button onClick={checkIsDFA}>Ist das Original ein DFA?</button>
+                      <button onClick={checkIsDFA}>Ist das Automat ein DFA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
@@ -920,7 +915,7 @@ const getEnhancedEdges = useCallback(() => {
                       <>
                       <h2 className="header">
                           {isDFAMinimized ? (
-                              <>Minimierter Automat:</>
+                              <>Minimaler Automat:</>
                           ) : (
                               <>Erzeugter Automat:</>
                           )}
