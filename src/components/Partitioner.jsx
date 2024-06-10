@@ -61,49 +61,15 @@ const formatPartitions = (partitions) => {
  * @param alphabet
  * @returns {[*,*]}
  */
-/*
-function refinePartitions(partitions, edges, symbol) {
-    let newPartitions = [];
 
-    // Loope jede Partition
-    partitions.forEach(partition => {
-        let partitionMap = new Map();
-
-        // Durchlaufe jeden Zustand in der aktuellen Partition
-        partition.forEach(node => {
-            // Finde den Zielzustand für den aktuellen Knoten und das spezifische Symbol
-            const target = findTargetState(node, symbol, edges);
-
-            // Finde die Partition, zu der der Zielzustand gehört
-            const targetPartition = target ? findPartitionForState(target, partitions) : null;
-
-            // Schlüssel basierend auf dem Zielzustand und der Partition, Müllzustände sind wichtig und bekommen eigenen Key
-            let key = targetPartition ? partitions.indexOf(targetPartition).toString() : 'none';
-
-            // Gruppiere Knoten basierend auf ihrem Zielzustand
-            if (!partitionMap.has(key)) {
-                partitionMap.set(key, []);
-            }
-            partitionMap.get(key).push(node);
-        });
-
-        // Füge die neu gebildeten Partitionen der Liste der neuen Partitionen hinzu
-        partitionMap.forEach(group => {
-            if (group.length > 0) {
-                newPartitions.push(group);
-            }
-        });
-    });
-
-    return newPartitions;
-}
-
-*/
 function refinePartitions(partitions, edges, alphabet) {
     let currentPartitions = partitions;
+    let history = [];
 
     alphabet.forEach(symbol => {
         let newPartitions = [];
+        let changed = false; // Flag, um zu überprüfen, ob sich eine Partition geändert hat
+        let changes = []; // Liste der Änderungen
 
         currentPartitions.forEach(partition => {
             let partitionMap = new Map();
@@ -127,71 +93,94 @@ function refinePartitions(partitions, edges, alphabet) {
             });
 
             // Füge die neu gebildeten Partitionen der Liste der neuen Partitionen hinzu
-            partitionMap.forEach(group => {
+            partitionMap.forEach((group, key) => {
                 if (group.length > 0) {
+                    const targetPartition = key !== 'none' ? currentPartitions[key] : null;
                     newPartitions.push(group);
+
+                    if (partitionMap.size > 1) {
+                        changes.push({
+                            symbol,
+                            sourcePartition: partition,
+                            group,
+                            targetPartition: targetPartition || 'Müllzustand'
+                        });
+                    }
                 }
             });
+
+            // Überprüfen, ob die aktuelle Partition aufgeteilt wurde
+            if (partitionMap.size > 1) {
+                changed = true;
+            }
         });
+
+        // Füge die aktuelle Verfeinerung zu den History-Einträgen hinzu
+        history.push({ symbol, partitions: newPartitions, changed, changes });
 
         // Aktualisiere die aktuellen Partitionen für das nächste Symbol
         currentPartitions = newPartitions;
     });
 
-    // Loope jede Partition
-    return currentPartitions;
+    // Gebe die neuen Partitionen und die History zurück
+    return { newPartitions: currentPartitions, history };
 }
 
 
-const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setPartitions,triggerCalculation,
-                         setTriggerCalculation, setPartitionsHistory, partitionHistory ,setIsDFAMinimized}) => {
 
-    let history = [{symbol: 'Start', partitions: partitions}];
+const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setPartitions, triggerCalculation, setTriggerCalculation, setPartitionsHistory, partitionHistory, setIsDFAMinimized }) => {
     const handleCalculateClick = () => {
         setTriggerCalculation(true); // löst den Trigger für die Berechnung
-
     };
 
     useEffect(() => {
         if (triggerCalculation && isDfaResult) {
-
             const refineAllPartitions = async () => {
                 let currentPartitions = partitions; // Start mit den initialen Partitionen
+                let history = [{ symbol: 'Start', partitions: partitions, changed: false }]; // Initialer History-Eintrag
 
-                for (const symbol of alphabet) {
-                    //auf die neuen Partitions warten damit wir die schleife nicht übel oft durchlaufen müssen
-                    const refinedPartitions = await refinePartitions(currentPartitions, edges, alphabet);
-                    //Historylogg
-                    history.push({symbol: symbol, partitions: refinedPartitions});
-                    // für nöchstes zeichen
+                let changed;
+                do {
+                    changed = false;
+                    for (const symbol of alphabet) {
+                        // Verfeinere die Partitionen mit dem aktuellen Symbol
+                        const { newPartitions, history: newHistory } = refinePartitions(currentPartitions, edges, [symbol]);
+                        history.push(...newHistory);
 
-                    currentPartitions = refinedPartitions;
-                }
+                        // Wenn sich eine Partition geändert hat, setzen wir das Flag auf true
+                        if (newHistory.some(entry => entry.changed)) {
+                            changed = true;
+                        }
+
+                        // Aktualisiere die aktuellen Partitionen
+                        currentPartitions = newPartitions;
+                    }
+                } while (changed); // Wiederhole den Vorgang, wenn sich eine Partition geändert hat
 
                 setPartitions(currentPartitions);
                 setPartitionsHistory(history);
-                //console.log(history);
+                setIsDFAMinimized(true);
             };
 
             refineAllPartitions().catch(console.error);
             setTriggerCalculation(false); // Setz Trigger zurück
-            setIsDFAMinimized(true);
         }
-    }, [triggerCalculation]);
+    }, [triggerCalculation, isDfaResult, partitions, edges, alphabet, setPartitions, setPartitionsHistory, setIsDFAMinimized]);
 
-
-    if (isDfaResult !== true) {
-        <button onClick={handleCalculateClick}>Berechnung auslösen</button>
-
-    } else {
-        return (
-            <>
-                <button onClick={handleCalculateClick} style={{ width: "250px" }}> Berechnung automatisch durchführen</button>
-                <h2> Zustandsklassen </h2>
-            </>
-        );
-    }
+    return (
+        <div>
+            {isDfaResult !== true ? (
+                <></>
+            ) : (
+                <>
+                    <button onClick={handleCalculateClick} style={{ width: "250px" }}>Berechnung automatisch durchführen</button>
+                    <h2>Zustandsklassen</h2>
+                </>
+            )}
+        </div>
+    );
 };
+
 
 export default Partitioner;
 

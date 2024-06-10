@@ -101,6 +101,10 @@ function App() {
     const [finalnodes, setfinalNodes, onfinalNodesChange] = useNodesState([]);
     const [finaledges, setfinalEdges, onfinalEdgesChange] = useEdgesState([]);
 
+    // States für die Anzeige der History mit Details
+    const [showDetails, setShowDetails] = useState(false);
+    const [detailsVisibility, setDetailsVisibility] = useState({}); // State für das Ein-/Ausblenden der Details
+
     //States für Hovering
 
     const [highlightHoverSymbol, setHighlightHoverSymbol] = useState(null);
@@ -128,6 +132,7 @@ function App() {
         setPartitions(updatedPartitions);
         setPartitionsHistory([]);
         setIsDfaResult(null);
+        setDetailsVisibility({});
 
     }, [nodes, alphabet, edges, implyTrashStates]);
 
@@ -152,6 +157,18 @@ function App() {
         setHighlightedPartition(null);  // Reset wenn Komponente abgemountet wird
 
     }, [setMenu, setEdgeMenu]);
+
+    /**
+     * Steuert welche Detaisl gerade aufgeklappt werden sollen
+     */
+
+    const toggleDetailsVisibility = (index) => {
+        setDetailsVisibility(prevState => ({
+            ...prevState,
+            [index]: !prevState[index]
+        }));
+    };
+
 
 
     /**
@@ -535,7 +552,7 @@ function App() {
      * @param historyEntry
      * @returns {JSX.Element}
      */
-    function renderPartitionWithSymbol(historyEntry) {
+    const renderPartitionWithSymbol = (historyEntry) => {
         if (!historyEntry || !historyEntry.partitions) {
             return <div>Partitionsgeschichte ist nicht verfügbar.</div>;
         }
@@ -548,11 +565,14 @@ function App() {
                         {partitionIndex < historyEntry.partitions.length - 1 ? " | " : ""}
         </span>
                 ))}
-                {historyEntry.symbol && <span className="symbol"> mit "{historyEntry.symbol}"</span>}
+                {historyEntry.symbol !== "Start" && (
+                    <span className="symbol"> mit <strong>{historyEntry.symbol}</strong></span>
+                )}
             </div>
 
         );
-    }
+    };
+
 
     /** Hilfsfunktion zum Prüfen ob der Automat schon minimal is, erzeugt ergebnis von automaticher berechnung für
      * Vergleich mit aktuell erzeugtem Automaten
@@ -769,6 +789,9 @@ function App() {
         return averagePosition;
     }
 
+    /**
+     *nicht sicher ob ich da sso nutzen möchte
+     */
     const NodeWithArrow = ({ id, data, position, style, targetPosition, sourcePosition }) => (
         <div className="react-flow__node-default" style={{ ...style, position: 'absolute', left: position.x, top: position.y }}>
             {data.input && <div className="input-arrow"></div>}
@@ -963,16 +986,43 @@ const getEnhancedEdges = useCallback(() => {
 
                     <div className="partition-history">
                         {partitionsHistory.map((historyEntry, index) => (
-                            <div key={index}
-                            >
-                                <div className="step-number" >{index+1}. Schritt:</div>
+                            <div key={index}>
+                                <div className="step-number">
+                                    {historyEntry.changed ? `${index + 1}. Schritt (Aufteilung)` : `${index + 1}. Überprüfung`}
+                                </div>
                                 <br/>
                                 {renderPartitionWithSymbol(historyEntry)}
+                                {historyEntry.changed && (
+                                    <div>
+                                        <button onClick={() => toggleDetailsVisibility(index)}>
+                                            {detailsVisibility[index] ? 'Details ausblenden' : 'Details einblenden'}
+                                        </button>
+                                        {detailsVisibility[index] && (
+                                            <div>
+                                                <strong>Konflikte:</strong>
+                                                <ul>
+                                                    {historyEntry.changes.map((change, changeIndex) => {
+                                                        const groupIds = change.group.map(node => node.id).join(', ');
+                                                        const targetPartitionIds = Array.isArray(change.targetPartition) ? change.targetPartition.map(node => node.id).join(', ') : change.targetPartition;
+                                                        const verb = change.group.length > 1 ? 'landen' : 'landet';
+                                                        const nomen = change.group.length > 1 ? 'Zustände' : 'Zustand';
 
+                                                        return (
+                                                            <li key={changeIndex}>
+                                                                {nomen} {`{${groupIds}}`} {verb} mit "{historyEntry.symbol}" in Klasse {`{${targetPartitionIds}}`}
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                                 <div style={{ height: '20px' }}></div>
                             </div>
                         ))}
                     </div>
+
                 </div>
               </div>
 
