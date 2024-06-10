@@ -54,9 +54,7 @@ export default function EdgeContextMenu({
     const initiatePartitioning = useCallback((selectedSymbol) => {
         const selectedEdge = getEdge(id);
         if (selectedEdge) {
-
             partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol);
-
         }
     }, [id, getEdge, partitionDFAWithEdge, partitions, edges]);
 

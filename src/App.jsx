@@ -456,6 +456,8 @@ function App() {
      * @param selectedEdge
      * @returns {{partitions: *[], changed: boolean}}
      */
+/*
+
 
     function partitionDFAWithEdge(partitions, edges, selectedEdge,selectedSymbol) {
 
@@ -510,6 +512,76 @@ function App() {
          setPartitions(newPartitions);
 
     }
+*/
+
+    function partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol) {
+        let newPartitions = [];
+        let changed = false;
+        let changes = []; // Um Änderungen zu protokollieren
+
+        // Finde die Partition, die den Source-Knoten des ausgewählten Edge enthält
+        const sourcePartition = partitions.find(partition =>
+            partition.some(node => node.id === selectedEdge.source)
+        );
+
+        if (!sourcePartition) {
+            // Falls die Source-Partition nicht gefunden wird, gib die ursprünglichen Partitionen zurück
+            return { partitions, changed: false };
+        }
+
+        let targetPartitionMap = new Map();
+
+        // Überprüfe nur die Partition, die die Source des ausgewählten Edge enthält für
+        sourcePartition.forEach(node => {
+            const target = findTargetState(node, selectedSymbol, edges);
+
+            if (target !== null) { // Ignoriere Müllzustände
+                const targetPartition = findPartitionForState(target, partitions);
+                if (targetPartition) {
+                    let nodes = targetPartitionMap.get(targetPartition) || [];
+                    nodes.push(node);
+                    targetPartitionMap.set(targetPartition, nodes);
+                }
+            } else {
+                // Behandle Knoten ohne gültigen Übergang für das Symbol separat
+                let nodes = targetPartitionMap.get(null) || [];
+                nodes.push(node);
+                targetPartitionMap.set(null, nodes);
+            }
+        });
+
+        // Erstelle neue Partitionen basierend auf der Gruppierung setze änderungsflag
+        targetPartitionMap.forEach((nodes, targetPartition) => {
+            if (nodes.length < sourcePartition.length) {
+                changed = true;
+                changes.push({
+                    group: nodes,
+                    targetPartition: targetPartition || 'null',
+                    sourcePartition: sourcePartition.map(node => node.id)
+                });
+            }
+            newPartitions.push(nodes);
+        });
+
+        // Füge die unveränderten Partitionen hinzu
+        partitions.forEach(partition => {
+            if (partition !== sourcePartition) {
+                newPartitions.push(partition);
+            }
+        });
+
+        // Append to history with changes
+        setPartitionsHistory(prevHistory => [
+            ...prevHistory,
+            { symbol: selectedSymbol, partitions: newPartitions, changed, changes }
+        ]);
+
+        // Gib die neuen Partitionen und das Änderungsflag zurück
+        setPartitions(newPartitions);
+        return { partitions: newPartitions, changed };
+    }
+
+
 
     /**
      * Aktualisieren des aktuell akzeptiereten Alphabets
