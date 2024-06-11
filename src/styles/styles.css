@@ -158,9 +158,11 @@ Dicker Rand für Endzustand
   text-align: center;
 }
 
+
+
 .Kontrollcontainer{
   border: 1px solid lightgray;
-  height: 100vh;
+
   width: 30vh;
   padding: 10px;
   border-radius: 5px;
@@ -215,8 +217,9 @@ Dicker Rand für Endzustand
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px; /* Abstand zum vorherigen Element */
+  margin-top: 10px;
 }
+
 
 .Kontrollcontainer .DFAAnzeige {
   margin-top: 10px;

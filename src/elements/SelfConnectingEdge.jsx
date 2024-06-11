@@ -3,8 +3,6 @@ import { BaseEdge, BaseEdgeProps, EdgeLabelRenderer,  } from 'reactflow';
 
 export default function SelfConnecting(props: BaseEdgeProps){
 
-  // we are using the default bezier edge when source and target ids are different
-  // wird schon in der App abgefangen.
 
   const { sourceX, sourceY, targetX, targetY, id, markerEnd, label,style } = props;
   const radiusX = (sourceX - targetX) * 0.5;

@@ -12,6 +12,7 @@ import ReactFlow, {
     ConnectionMode,
     Node, MarkerType
 } from 'reactflow';
+import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
 import { ReactFlowProvider } from 'react-flow-renderer'
 import 'reactflow/dist/style.css';
 import './styles/styles.css'
@@ -20,6 +21,7 @@ import './updatenode.css';
 import NodeContextMenu from './components/NodeContextMenu';
 import EdgeContextMenu from './components/EdgeContextMenu';
 import SelfConnectingEdge from './elements/SelfConnectingEdge';
+import CustomEdge from './components/CustomEdge';
 import BaseNode from './elements/BaseNode';
 
 
@@ -36,6 +38,8 @@ import NodeLabelList from './components/NodeLabelList';
 const EdgeTypes = {
     //buttonedge: ButtonEdge,
     selfconnecting: SelfConnectingEdge,
+    custom: CustomEdge,
+    smart: SmartBezierEdge
 };
 
 const NodeTypes = {
@@ -97,6 +101,7 @@ function App() {
 
     const [partitions, setPartitions] = useState(initialPartition(nodes));
     const [partitionsHistory, setPartitionsHistory] = useState([]);
+
     //States für die Ausgabe des Äquivalenzautomaten
     const [finalnodes, setfinalNodes, onfinalNodesChange] = useNodesState([]);
     const [finaledges, setfinalEdges, onfinalEdgesChange] = useEdgesState([]);
@@ -104,6 +109,7 @@ function App() {
     // States für die Anzeige der History mit Details
     const [showDetails, setShowDetails] = useState(false);
     const [detailsVisibility, setDetailsVisibility] = useState({}); // State für das Ein-/Ausblenden der Details
+    const [miniKonfigVisibility, setMiniKonfigVisibility] = useState(false);
 
     //States für Hovering
 
@@ -130,8 +136,10 @@ function App() {
     useEffect(() => {
         const updatedPartitions = initialPartition(nodes);
         setPartitions(updatedPartitions);
-        setPartitionsHistory([]);
+        setPartitionsHistory([{ symbol: 'Start', partitions: updatedPartitions, changed: false }]);
         setIsDfaResult(null);
+        setIsDFAMinimized(false);
+        setMiniKonfigVisibility(false);
         setDetailsVisibility({});
 
     }, [nodes, alphabet, edges, implyTrashStates]);
@@ -167,6 +175,14 @@ function App() {
             ...prevState,
             [index]: !prevState[index]
         }));
+    };
+
+    /**
+     * Steuert ob die Minimalautomatkonfiguration aufgeklappt werden soll
+     */
+
+    const toggleMiniKonfigVisibility = () => {
+        setMiniKonfigVisibility(!miniKonfigVisibility);
     };
 
 
@@ -244,12 +260,19 @@ function App() {
                     };
                     setEdges((edges) => [...edges, newEdge]);
                 } else {
+
+                    // Prüfen, ob eine entgegenlaufende Kante existiert
+                    const existingEdge = edges.find(
+                        (edge) => edge.source === params.target && edge.target === params.source
+                    );
+
                     const newEdge = {
                         id: `edge-${params.source}-${params.target}`,
                         source: params.source,
                         target: params.target,
                         label: label,
-                        type: "default",
+                        data: { label: label },
+                        type: existingEdge ? "custom" : "default", // Custom nur für neue kollisionen verwenden
                         markerEnd: { type: MarkerType.ArrowClosed },
                     };
 
@@ -258,8 +281,9 @@ function App() {
                 }
             }
         },
-        [setEdges]
+        [setEdges, edges, alphabet]
     );
+
 
     /*
         const onConnect = useCallback(
@@ -646,13 +670,12 @@ function App() {
                         {partitionIndex < historyEntry.partitions.length - 1 ? " | " : ""}
         </span>
                 ))}
-                {historyEntry.symbol !== "Start" && (
-                    <span className="symbol"> mit {historyEntry.symbol}</span>
-                )}
+
             </div>
 
         );
     };
+
 
 
     /** Hilfsfunktion zum Prüfen ob der Automat schon minimal is, erzeugt ergebnis von automaticher berechnung für
@@ -702,6 +725,8 @@ function App() {
         // Loope jede Partition
         return currentPartitions;
     }
+
+
 
     /** Prüft ob zwei Partitionen identisch sind
      *
@@ -814,14 +839,23 @@ function App() {
             if (!edgeLabelsMap[edgeKey]) {
                 edgeLabelsMap[edgeKey] = { labels: new Set(), type: null };
             }
+
+
+            const normalizedLabel = edge.label.replace(/,\s*/g, " "); // Ersetzt Kommas und darauf folgende Leerzeichen durch ein Leerzeichen
+            normalizedLabel.split(" ").forEach(label => edgeLabelsMap[edgeKey].labels.add(label)); //keine dupletten
+
+
+            //Kollisionskanten
+            const reverseEdgeKey = `${targetPartition}->${sourcePartition}`;
+            if (edgeLabelsMap[reverseEdgeKey]) {
+                edgeLabelsMap[edgeKey].type = 'default'; // Setze den Typ auf custom für gegenläufige Kanten
+                edgeLabelsMap[reverseEdgeKey].type = 'smart';
+            }
+
             // Überprüfe, ob die Kante eine Selbstkante ist
             if (sourcePartition === targetPartition) {
                 edgeLabelsMap[edgeKey].type = 'selfconnecting';
             }
-
-            const normalizedLabel = edge.label.replace(/,\s*/g, " "); // Ersetzt Kommas und darauf folgende Leerzeichen durch ein Leerzeichen
-            normalizedLabel.split(" ").forEach(label => edgeLabelsMap[edgeKey].labels.add(label)); //keine dupletten
-            //
         });
 
         //  neue Kanten basierend auf edgeLabelsMap, einschließlich Selbstkanten
@@ -834,7 +868,8 @@ function App() {
                 source: source,
                 target: target,
                 label: labelsString,
-                type: edgeLabelsMap[key].type
+                data: {label: labelsString},
+                type: edgeLabelsMap[key].type || 'default'
             };
             newEdges.push(newEdge);
         });
@@ -943,15 +978,6 @@ const getEnhancedEdges = useCallback(() => {
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
                   <h3 className ="aktuelleKonfiguration"> Konfiguration des Automaten:</h3>
-                  {/* auskommentiertes Eingabefeld für das Alphabet
-                  <div>
-                      <label>Alphabet bearbeiten:</label>
-                      <input className= "inputAlphabet"
-                          type="text"
-                          value={inputAlphabet}
-                          onInput={(e) => {handleAlphabetInput(e)}}/>
-                  </div>
-                  */}
 
                       <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
                       <div className="zustände">{`Z = {${nodes.map((node) => node.data.label).join(",  ")}}`}</div>
@@ -972,22 +998,44 @@ const getEnhancedEdges = useCallback(() => {
                   </div>
               </div>
                   <div className="DFAContainer">
-                      <button onClick={checkIsDFA}>Ist das Automat ein DFA?</button>
+                      <button onClick={checkIsDFA}>Ist der konfigurierte Automat ein DFA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
                       {isDfaResult === true && (
                           <>
-                              <button onClick={checkIfMinimizedDFA}>Ist der erzeugte Automat minimal?</button>
+                              <button onClick={checkIfMinimizedDFA}>Ist der erzeugte Automat bereits minimal?</button>
                               <div className={`IfMinimizedDFA ${isDFAMinimized !== null ? (isDFAMinimized ? 'true' : 'false') : ''}`}>
                                   {isDFAMinimized !== null && (<div>{isDFAMinimized ? 'Ja' : 'Nein'}</div>)}
                               </div>
                           </>
                       )}
                   </div>
+                  <div>
 
 
-          </div>
+                      {
+                          isDFAMinimized === true && (<button onClick={() => toggleMiniKonfigVisibility()}>
+                              {miniKonfigVisibility ? 'Details ausblenden' : 'Details einblenden'}
+                          </button>)
+                      }
+                  {
+                      miniKonfigVisibility === true && isDFAMinimized === true &&
+                      (
+                          <div className="miniKonfiguration">
+                              <h3 className ="aktuelleKonfiguration"> Konfiguration des Minimalautomaten:</h3>
+                          <div className="zustände">{`Z = {${finalnodes.map((node) => node.data.label).join(",  ")}}`}</div>
+                          <div className="zustände">
+                              {`E = {${finalnodes.filter((node) => node.data.output).map((node) => node.data.label).join(", ")}}`}
+                          </div>
+                          <NodeLabelList nodes={finalnodes} edges={finaledges}/>
+
+                          </div>)
+                  }
+
+
+                </div>
+              </div>
               <div className="reactFlowsContainer" style={{ height: '140vh', width: '90%', marginBottom: '20px' }}>
 
         <ReactFlow
@@ -1051,7 +1099,10 @@ const getEnhancedEdges = useCallback(() => {
                   )}
 
                  </div>
-                <div className= "partitiondiv" style={{height:'40vh', width:'85%', display: 'flex', flexDirection: 'column' , padding: '20px'}}>
+
+                <div className= "partitiondiv" style={{height:'60vh', width:'85%', display: 'flex', flexDirection: 'column' , padding: '15px'}}>
+                    {partitions && isDfaResult &&(
+                        <>
                     <Partitioner
                         isDfaResult={isDfaResult}
                         nodes={nodes}
@@ -1071,7 +1122,7 @@ const getEnhancedEdges = useCallback(() => {
                             <div key={index} className="partitionHistoryColumn">
                                 {index > 0 && (
                                     <div className="step-number">
-                                        {index}. {historyEntry.changed ? ` Aufteilung` : ` Überprüfung`} mit <strong>{historyEntry.symbol}</strong>
+                                        {index}. {historyEntry.changed ? ` Aufteilung` : ` Überprüfung`} mit Symbol <strong>{historyEntry.symbol}</strong>:
                                     </div>
                                 )}
                                 <br/>
@@ -1087,13 +1138,13 @@ const getEnhancedEdges = useCallback(() => {
                                                 <ul>
                                                     {historyEntry.changes.map((change, changeIndex) => {
                                                         const groupIds = change.group.map(node => node.id).join(', ');
-                                                        const targetPartitionIds = Array.isArray(change.targetPartition) ? change.targetPartition.map(node => node.id).join(', ') : change.targetPartition;
-                                                        const verb = change.group.length > 1 ? 'landen' : 'landet';
+                                                        const targetPartitionIds = Array.isArray(change.targetPartition) ? change.targetPartition.map(node => node.id).join(', ') : 'Müllzustand';
+                                                        const verb = change.group.length > 1 ? 'gehen' : 'geht';
                                                         const nomen = change.group.length > 1 ? 'Zustände' : 'Zustand';
 
                                                         return (
                                                             <li key={changeIndex}>
-                                                                {nomen} {`{${groupIds}}`} {verb} mit "{historyEntry.symbol}" in Klasse {`{${targetPartitionIds}}`}
+                                                                {nomen} {`{${groupIds}}`} {verb} mit "{historyEntry.symbol}" in Klasse {`{${targetPartitionIds}}`} über.
                                                             </li>
                                                         );
                                                     })}
@@ -1102,11 +1153,12 @@ const getEnhancedEdges = useCallback(() => {
                                         )}
                                     </div>
                                 )}
-                                <div style={{ height: '20px' }}></div>
+                                <div style={{ height: '15px' }}></div>
                             </div>
                         ))}
                     </div>
-
+                </>
+                    )}
                 </div>
               </div>
 

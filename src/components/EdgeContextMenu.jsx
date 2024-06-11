@@ -85,7 +85,7 @@ export default function EdgeContextMenu({
             </p>
 
             {isDfaResult && (
-                <div> {/* Wrap buttons in a container for better layout */}
+                <div>
                     {symbols.map((symbol, index) => (
                         <button
                             key={index}
@@ -99,8 +99,8 @@ export default function EdgeContextMenu({
                 </div>
             )}
 
-            <button onClick ={deleteEdge}>Löschen</button>
-            <button onClick ={renameEdge}>Symbol(e) ändern</button>
+            <button onClick ={renameEdge}>Symbol ändern</button>
+            <button onClick ={deleteEdge}>Übergang Löschen</button>
 
 
         </div>
