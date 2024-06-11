@@ -459,21 +459,19 @@ function App() {
             return false;
         }
 
-        // Überprüfung der Erreichbarkeit aller Zustände
+        // Überprüfung der Erreichbarkeit aller Zustände naja... still to debug
         let visited = new Set();
         let queue = [startStateId];
         while (queue.length > 0) {
             const currentState = queue.shift();
             if (!visited.has(currentState)) {
                 visited.add(currentState);
-                nodes.forEach(node => {
-                    alphabet.forEach(symbol => {
-                        const key = `${currentState}-${symbol}`;
-                        const targetState = transitions.get(key);
-                        if (targetState && !visited.has(targetState)) {
-                            queue.push(targetState);
-                        }
-                    });
+                alphabet.forEach(symbol => {
+                    const key = `${currentState}-${symbol}`;
+                    const targetState = transitions.get(key);
+                    if (targetState && !visited.has(targetState)) {
+                        queue.push(targetState);
+                    }
                 });
             }
         }
@@ -978,7 +976,7 @@ function App() {
                     target: node.id,
                     label: '',
                     markerEnd: { type: MarkerType.ArrowClosed },
-                    style: { stroke: '#000' },
+
                     type: 'smoothstep',
                     animated: false,
                     selectable: false,
