@@ -39,7 +39,7 @@ const EdgeTypes = {
     //buttonedge: ButtonEdge,
     selfconnecting: SelfConnectingEdge,
     custom: CustomEdge,
-    smart: SmartBezierEdge
+
 };
 
 const NodeTypes = {
@@ -71,14 +71,16 @@ function App() {
 
     // Beispiel 1
     const plainField = () => {
-
+        setEdgeMenu(null);
+        setMenu(null);
         setNodes(prev => exampleNodes);
         setEdges(prev => exampleEdges);
         setAlphabet(['a', 'b', 'c']);
     }
     //minimalKonfiguration als Start
     const miniField = () => {
-
+        setEdgeMenu(null);
+        setMenu(null);
         setNodes(prev => miniNodes);
         setEdges(prev => miniEdges);
         setAlphabet(['a']);
@@ -87,6 +89,8 @@ function App() {
     //beispiel 3
 
     const exampleField3 = () => {
+        setEdgeMenu(null);
+        setMenu(null);
         setNodes(prev => initialNodes3);
         setEdges(prev => initialEdges3);
 
@@ -121,12 +125,17 @@ function App() {
 
     /**
      * das Alphabet soll automatisch aktualisiert werden, sobald neue symbole hinzukommen!
+     * Der versteckte Knoten mit dem ungelabelten Inputknoten ist davon ausgenommen
      */
     useEffect(() => {
         const symbols = new Set();
-        edges.forEach(edge => {
+        edges.filter(edge => !edge.source.includes('hidden') && !edge.target.includes('hidden')).forEach(edge => {
             const edgeSymbols = edge.label.split(/[,;\s]\s*/).map(symbol => symbol.trim());
-            edgeSymbols.forEach(symbol => symbols.add(symbol));
+            edgeSymbols.forEach(symbol => {
+                if (symbol !== '') {
+                    symbols.add(symbol);
+                }
+            });
         });
         setAlphabet(Array.from(symbols));
     }, [edges]);
@@ -134,7 +143,7 @@ function App() {
 
     //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen  initialisiert.
     useEffect(() => {
-        const updatedPartitions = initialPartition(nodes);
+        const updatedPartitions = initialPartition(nodes.filter(node => node.style?.visibility !== 'hidden'));
         setPartitions(updatedPartitions);
         setPartitionsHistory([{ symbol: 'Start', partitions: updatedPartitions, changed: false }]);
         setIsDfaResult(null);
@@ -387,6 +396,9 @@ function App() {
      */
 
     function isDFA(nodes, edges, alphabet) {
+        nodes = nodes.filter(node => node.style?.visibility !== 'hidden')
+        edges = edges.filter(edge => !edge.source.includes('hidden') )
+
 
         if (!nodes || !edges || !alphabet) {
             console.error('Einer der Inputs (nodes, edges, alphabet) ist nicht richtig definiert.');
@@ -850,7 +862,7 @@ function App() {
             const reverseEdgeKey = `${targetPartition}->${sourcePartition}`;
             if (edgeLabelsMap[reverseEdgeKey]) {
                 edgeLabelsMap[edgeKey].type = 'default'; // Setze den Typ auf custom für gegenläufige Kanten
-                edgeLabelsMap[reverseEdgeKey].type = 'smart';
+                edgeLabelsMap[reverseEdgeKey].type = 'custom';
             }
 
             // Überprüfe, ob die Kante eine Selbstkante ist
@@ -879,8 +891,36 @@ function App() {
         setfinalEdges(newEdges);
     };
 
+    const onNodeDrag = useCallback(
+        (event, node) => {
+            if (node.data.input === true) {
+                const hiddenNodeId = `${node.id}-hidden`;
+                setNodes((nds) =>
+                    nds.map((n) => {
+                        if (n.id === hiddenNodeId) {
+                            return {
+                                ...n,
+                                position: {
+                                    x: node.position.x - 50,
+                                    y: node.position.y,
+                                },
+                            };
+                        }
+                        return n;
+                    })
+                );
+            }
+        },
+        [setNodes]
+    );
 
-    //VErsuch automatisch neue Graphen zu positionierne
+
+    /**
+     * Automatische Berechnung der Positionen der Zustände des erzeugten Graphen
+     * @param partition
+     * @param originalNodes
+     * @returns {{x: number, y: number}}
+     */
 
     function calculateAveragePosition(partition, originalNodes) {
         const positions = partition.map(node => {
@@ -908,49 +948,60 @@ function App() {
     }
 
     /**
-     *nicht sicher ob ich da sso nutzen möchte
+     * Erstelle die anzeige der knoten, für den unsichtbaren Knoten außerhalb jeglicher Logik
+     * @param nodes
+     * @param edges
+     * @returns {{displayEdges: *[], displayNodes: *[]}}
      */
-    const NodeWithArrow = ({ id, data, position, style, targetPosition, sourcePosition }) => (
-        <div className="react-flow__node-default" style={{ ...style, position: 'absolute', left: position.x, top: position.y }}>
-            {data.input && <div className="input-arrow"></div>}
-            {data.label}
-        </div>
-    );
+    const generateDisplayNodesAndEdges = (nodes, edges) => {
+        const displayNodes = [...nodes];
+        const displayEdges = [...edges];
+
+        nodes.forEach(node => {
+            if (node.data.input) {
+                const hiddenNodeId = `${node.id}-hidden`;
+                const hiddenNode = {
+                    id: hiddenNodeId,
+                    data: { label: `${node.id}-hidden` },
+                    position: { x: node.position.x - 50, y: node.position.y },
+                    sourcePosition: 'right',
+                    targetPosition: 'left',
+                    style: { visibility: 'hidden' },
+                    animated: false,
+                    updateable: false,
+                    connectable: false,
+                };
+
+                const hiddenEdge = {
+                    id: `edge-${hiddenNodeId}-${node.id}`,
+                    source: hiddenNodeId,
+                    target: node.id,
+                    label: '',
+                    markerEnd: { type: MarkerType.ArrowClosed },
+                    style: { stroke: '#000' },
+                    type: 'smoothstep',
+                    animated: false,
+                    selectable: false,
+                };
+
+                displayNodes.push(hiddenNode);
+                displayEdges.push(hiddenEdge);
+            }
+        });
+
+        return { displayNodes, displayEdges };
+    };
+    /**
+     * Zwischenspeichern der AnzeigeKnoten in useMemo
+     */
+    const { displayNodes, displayEdges } = useMemo(() => generateDisplayNodesAndEdges(nodes, edges), [nodes, edges]);
 
 
     /**
      *  dynamisches Stylen der Edges als enhance edges mit  hover-based styling
      */
 
-        //
-    /*
 
-const getEnhancedEdges = useCallback(() => {
-       return finaledges.map(edge => {
-
-           // sollte die Kante highlighted werden?
-
-           const shouldHighlight = hoverIndex !== null && (
-               edge.label.split(/[,;\s]\s).some(
-//es fehlt noch "* /" bei den splits
-                        symbol => partitionsHistory[hoverIndex]?.symbol.includes(symbol)
-                    ) || edge.label.includes(highlightHoverSymbol)
-                );
-
-                //hier extra highlight vom menü
-
-                return {
-                    ...edge,
-                    style: {
-                        ...edge.style,
-                        strokeWidth: shouldHighlight ? 2 : 1,
-                        stroke: shouldHighlight ? 'red' : '#b1b1b7'
-                    }
-                };
-            });
-        }, [finaledges, hoverIndex, partitionsHistory,highlightHoverSymbol]);
-
-     */
     const getEnhancedEdges = useCallback(() => {
         return finaledges.map(edge => {
 
@@ -980,24 +1031,34 @@ const getEnhancedEdges = useCallback(() => {
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
                   <h3 className ="aktuelleKonfiguration"> Konfiguration des Automaten:</h3>
 
-                      <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
-                      <div className="zustände">{`Z = {${nodes.map((node) => node.data.label).join(",  ")}}`}</div>
-                          <div className="zustände">
-                              {`E = {${nodes.filter((node) => node.data.output).map((node) => node.data.label).join(", ")}}`}
-                          </div>
-
-                      <NodeLabelList nodes={nodes} edges = {edges}/>
-                  <div className="examplebuttons">
-                      <button onClick={miniField} style={{ marginRight: '10px' }}> Reset</button>
-                  <button onClick={resetPage} style={{ marginRight: '10px' }}> Beispiel 1</button>
-                      <button onClick={plainField} style={{ marginRight: '10px' }}> Beispiel 2</button>
-                      <button onClick={exampleField3} style={{ marginRight: '10px' }}> Beispiel 3</button>
-                      <div>
-                      <label className={implyTrashStates} style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
-                          Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates}/>
-                      </label>
+                  <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
+                  <div className="zustände">
+                      {`Z = {${nodes.filter(node => node.style?.visibility !== 'hidden').map((node) => node.data.label).join(",  ")}}`}
                   </div>
-              </div>
+                  <div className="zustände">
+                      {`E = {${nodes.filter(node => node.style?.visibility !== 'hidden' && node.data.output).map((node) => node.data.label).join(", ")}}`}
+                  </div>
+
+
+                  <NodeLabelList nodes={nodes.filter(node => node.style?.visibility !== 'hidden')} edges = {edges}/>
+
+                  <div className="examplebuttons">
+                      <div className="dropdown">
+                          <button className="dropbtn">Beispielauswahl</button>
+                          <div className="dropdown-content">
+                              <button onClick={miniField}>Reset</button>
+                              <button onClick={resetPage}>Beispiel 1</button>
+                              <button onClick={plainField}>Beispiel 2</button>
+                              <button onClick={exampleField3}>Beispiel 3</button>
+                          </div>
+                      </div>
+                      <div>
+                          <label className="implyTrashStates" style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
+                              Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates} />
+                          </label>
+                      </div>
+                  </div>
+
                   <div className="DFAContainer">
                       <button onClick={checkIsDFA}>Ist der konfigurierte Automat ein DFA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
@@ -1041,10 +1102,11 @@ const getEnhancedEdges = useCallback(() => {
 
         <ReactFlow
             ref={ref}
-            nodes={nodes}
-            edges={edges}
+            nodes={displayNodes}
+            edges={displayEdges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            onNodeDrag={onNodeDrag}
             onPaneClick={onPaneClick}
             onConnect={onConnect}
             edgeTypes={EdgeTypes}

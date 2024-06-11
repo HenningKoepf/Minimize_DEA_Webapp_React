@@ -17,14 +17,14 @@ export const initialNodes3: Node[] = [
     {
         id: 'Z1',
         data: { label: 'Z1' },
-        position: { x: 250, y: 100 },
+        position: { x: 170, y: 20 },
         targetPosition: 'left',
         sourcePosition: 'right',
     },
     {
         id: 'Z2',
         data: { label: 'Z2' },
-        position: { x: 250, y: 150 },
+        position: { x: 200, y: 200 },
         targetPosition: 'left',
         sourcePosition: 'right',
     },

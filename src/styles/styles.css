@@ -18,7 +18,6 @@
   display: block;
 font-weight: bold;
 }
-
 .context-menu {
   background: white;
   border-style: solid;
@@ -26,6 +25,7 @@ font-weight: bold;
   position: absolute;
   z-index: 10;
 }
+
 
 .context-menu button {
   border: none;
@@ -421,4 +421,64 @@ Anzeige der bisherigen Partitionen scrollbar
   padding: 10px; /* Abstand zwischen Rahmen und Inhalt */
   margin-bottom: 10px; /* Abstand zwischen Elementen */
 }
+
+.examplebuttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background-color: lightgreen; /* Green */
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #3e8e41;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-style: solid;
+}
+
+.dropdown-content button {
+  color: black;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.5em;
+  width: 100%;
+}
+
+.dropdown-content button:hover {
+  background: white;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}
+
 

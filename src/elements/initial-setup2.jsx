@@ -1,15 +1,11 @@
-import {
-    Node, MarkerType
-
-} from 'reactflow';
-
+import { Node, Edge, MarkerType } from 'reactflow';
 
 export const initialNodes: Node[] = [
 
     {
         id: 'Z1',
-        style: {backgroundColor: '#a4d36b' },
-        data: { label: 'Z1' , input: true},
+        style: { backgroundColor: '#a4d36b' },
+        data: { label: 'Z1', input: true },
         position: { x: 100, y: 100 },
         sourcePosition: 'right',
         targetPosition: 'left',
@@ -31,27 +27,26 @@ export const initialNodes: Node[] = [
     {
         id: 'Z5',
         style: {
-            border: "3px solid black" ,
+            border: "3px solid black",
             borderStyle: "double",
         },
-        data: {label: 'Z5', output: true },
+        data: { label: 'Z5', output: true },
         position: { x: 500, y: 150 },
         targetPosition: 'left',
-        sourcePosition: 'right'
+        sourcePosition: 'right',
     },
     {
         id: 'Z6',
         style: {
-            border: "3px solid black" ,
+            border: "3px solid black",
             borderStyle: "double",
         },
-        data: {label: 'Z6', output: true },
+        data: { label: 'Z6', output: true },
         position: { x: 500, y: 50 },
         targetPosition: 'left',
-        sourcePosition: 'right'
+        sourcePosition: 'right',
     },
 ];
-
 
 export const initialEdges: Edge[] = [
 
@@ -92,7 +87,7 @@ export const initialEdges: Edge[] = [
     },
     {
         id: 'edge-Z5-Z5',
-        label: 'a, b' ,
+        label: 'a, b',
         source: 'Z5',
         target: 'Z5',
         type: 'selfconnecting',
@@ -100,11 +95,10 @@ export const initialEdges: Edge[] = [
     },
     {
         id: 'edge-Z6-Z6',
-        label: 'a b' ,
+        label: 'a b',
         source: 'Z6',
         target: 'Z6',
         type: 'selfconnecting',
         markerEnd: { type: MarkerType.ArrowClosed },
     },
-
 ];

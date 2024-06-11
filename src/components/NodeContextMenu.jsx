@@ -105,6 +105,7 @@ export default function NodeContextMenu({
               backgroundColor: undefined,
             };
 
+
             return {...node,  data: {...node.data, input: newInputState} ,style: {...newStyle},}
           }
           return node;
