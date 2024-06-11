@@ -232,6 +232,7 @@ function App() {
                     setHighlightedPartition: setHighlightedPartition,
                     highlightedPartition: highlightedPartition,
                 isDfaResult: isDfaResult,
+                    isDFAMinimized: isDFAMinimized,
             });
 
 

@@ -17,6 +17,7 @@ export default function EdgeContextMenu({
                                             highlightedPartition,
                                             setHighlightedPartition,
                                             isDfaResult,
+                                            isDFAMinimized,
 
                                             ...props
                                         }) {
@@ -84,7 +85,7 @@ export default function EdgeContextMenu({
                 <small>Kante: {id}</small>
             </p>
 
-            {isDfaResult && (
+            {isDfaResult && !isDFAMinimized &&(
                 <div>
                     {symbols.map((symbol, index) => (
                         <button
