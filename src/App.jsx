@@ -23,6 +23,7 @@ import EdgeContextMenu from './components/EdgeContextMenu';
 import SelfConnectingEdge from './elements/SelfConnectingEdge';
 import CustomEdge from './components/CustomEdge';
 import BaseNode from './elements/BaseNode';
+import Sidebar from './components/Sidebar';
 
 
 import {initialNodes, initialEdges} from './elements/initial-setup2';
@@ -295,38 +296,90 @@ function App() {
     );
 
 
-    /*
-        const onConnect = useCallback(
-            (params) => {
-                if ( params.source === params.target){
-                    const newEdge = {
-                        id: `edge-${params.source}-${params.target}`,
-                        source: params.source,
-                        target: params.target,
-                        label: "a",
-                        type: "selfconnecting",
-                        markerEnd: { type: MarkerType.ArrowClosed },
-                    };
-                    setEdges((edges) => [...edges, newEdge]);
-                }
-                else{
+    /**
+     * Drag an drop neuer Knoten
+     */
+    let id = 0;
+    const getId = () => `CopyZustand_${id++}`;
+    const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
-                    const newEdge = {
-                        id: `edge-${params.source}-${params.target}`,
-                        source: params.source,
-                        target: params.target,
-                        label:  "a",
-                        type: "default",
-                        markerEnd: { type: MarkerType.ArrowClosed },
+
+    const onDragOver = useCallback((event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+    }, []);
+
+    const onDrop = useCallback(
+        (event) => {
+            event.preventDefault();
+
+            const type = event.dataTransfer.getData('application/reactflow');
+
+            if (typeof type === 'undefined' || !type) {
+                return;
+            }
+
+            const newLabel = prompt("Bitte geben Sie das Label für den neuen Zustand ein:");
+            if (!newLabel) {
+                // Abbrechen, wenn kein Label eingegeben wurde
+                return;
+            }
+
+            const position = reactFlowInstance.screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY,
+            });
+
+            let newNode;
+
+            switch (type) {
+                case 'default':
+                    newNode = {
+                        id: newLabel,
+                        data: { label: newLabel },
+                        position,
+                        targetPosition: 'left',
+                        sourcePosition: 'right',
+                    };
+                    break;
+                case 'input':
+                    newNode = {
+                        id: newLabel,
+                        data: { label: newLabel, input: true },
+                        position,
+                        targetPosition: 'left',
+                        sourcePosition: 'right',
+                        style: { backgroundColor: '#a4d36b' },
                     };
 
-                    // Aktualisiere die Edge-Liste mit der zusätzlichen Kante
-                    setEdges((edges) => [...edges, newEdge]);
-                 }
-                },
-            [setEdges]
-        );
-        */
+                    break;
+                case 'output':
+                    newNode = {
+                        id: newLabel,
+                        data: { label: newLabel, output: true },
+                        position,
+                        targetPosition: 'left',
+                        sourcePosition: 'right',
+                        style: { border: '3px solid black', borderStyle: 'double' },
+                    };
+                    break;
+                default:
+
+                    newNode = {
+                        id: newLabel,
+                        data: { label: newLabel },
+                        position,
+                        targetPosition: 'left',
+                        sourcePosition: 'right',
+                    };
+                    break;
+            }
+
+            setNodes((nds) => nds.concat(newNode));
+        },
+        [reactFlowInstance],
+    );
+
 
     /**
      * Öffnet das Kontextmenü der Knoten
@@ -976,6 +1029,7 @@ function App() {
                     target: node.id,
                     label: '',
                     markerEnd: { type: MarkerType.ArrowClosed },
+                    selectable: false,
 
                     type: 'smoothstep',
                     animated: false,
@@ -1064,7 +1118,7 @@ function App() {
                       </div>
                       {isDfaResult === true && (
                           <>
-                              <button onClick={checkIfMinimizedDFA}>Ist der erzeugte Automat bereits minimal?</button>
+                              <button onClick={checkIfMinimizedDFA}>Ist der erzeugte Automat minimal?</button>
                               <div className={`IfMinimizedDFA ${isDFAMinimized !== null ? (isDFAMinimized ? 'true' : 'false') : ''}`}>
                                   {isDFAMinimized !== null && (<div>{isDFAMinimized ? 'Ja' : 'Nein'}</div>)}
                               </div>
@@ -1109,18 +1163,25 @@ function App() {
             onConnect={onConnect}
             edgeTypes={EdgeTypes}
             nodeTypes={NodeTypes}
+            onInit={setReactFlowInstance}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
             onNodeContextMenu = {onNodeContextMenu}
             onEdgeContextMenu = {onEdgeContextMenu}
             fitView //Für den automatischen Fullscreen
         >
           <Controls />
-          <MiniMap pannable />
-          <Background variant="dots" gap={15} size={1} />
+
+            <MiniMap pannable />
+            <Background variant="dots" gap={15} size={1} />
             {menu && <NodeContextMenu onClick={onPaneClick} {...menu} />}
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
 
-            <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
+
+
+                  <Sidebar />
+                  <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
 
 
                   <div className="finalFlowrenderer" style={{ height: '80vh', width: '95%' }}>
@@ -1129,14 +1190,14 @@ function App() {
                       <>
                       <h2 className="header">
                           {isDFAMinimized ? (
-                              <>Minimaler Automat:</>
+                              <>Erzeugter minimaler Automat:</>
                           ) : (
                               <>Erzeugter Automat:</>
                           )}
                       </h2>
                   <ReactFlow
                       ref={refFinal}
-                      nodes={finalnodes}
+                      nodes={finalnodes.filter(node => !node.id.includes('hidden'))}
                       edges={getEnhancedEdges()}
                       onNodesChange={onfinalNodesChange}
                       onEdgesChange={onfinalEdgesChange}
@@ -1166,10 +1227,10 @@ function App() {
                         <>
                     <Partitioner
                         isDfaResult={isDfaResult}
-                        nodes={nodes}
+                        nodes={nodes.filter(node => !node.id.includes('hidden'))}
                         edges={edges}
                         alphabet={alphabet}
-                        partitions={initialPartition(nodes)}
+                        partitions={initialPartition(nodes.filter(node => !node.id.includes('hidden')))}
                         setPartitions={setPartitions}
                         triggerCalculation={triggerCalculation}
                         setTriggerCalculation={setTriggerCalculation}

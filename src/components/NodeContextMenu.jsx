@@ -99,12 +99,11 @@ export default function NodeContextMenu({
             const newInputState = !currentlyInput;
 
             const newStyle = newInputState ? {
-              ...node.style, backgroundColor: '#a4d36b'}
+                  ...node.style, backgroundColor: '#a4d36b'}
                 : {
-              ...node.style,
-              backgroundColor: undefined,
-            };
-
+                  ...node.style,
+                  backgroundColor: undefined,
+                };
 
             return {...node,  data: {...node.data, input: newInputState} ,style: {...newStyle},}
           }
@@ -181,26 +180,53 @@ export default function NodeContextMenu({
 
   /**
    * Funktion um einen Knoten umzubenennen, autom. rerendering über Callback
+   * erzeugt beim umbenennen auch einen neuen hidden Knoten mit neuem edge
+   * ein bisschen wonky denn die hiddenNodes werden nur üüber is postfix identifiziert
    * @type {(function(): void)|*}
    */
   const renameNode = useCallback(() => {
     const newLabel = window.prompt("Geben Sie den neuen Namen für den Knoten ein:", "");
     if (newLabel && newLabel.trim() !== "") {
-      // Map auf alle knoten, einen neuen zrück
+      // Map auf alle Knoten, einen neuen dann zurück
       setNodes((prevNodes) =>
-          prevNodes.map((node) => node.id === id ? { ...node, id: newLabel, data: { ...node.data, label: newLabel } } : node)
+          prevNodes.map((node) => {
+            if (node.id === id) {
+              const newNode = { ...node, id: newLabel, data: { ...node.data, label: newLabel } };
+
+              // damit der versteckte knoten weiterhin mit dem gleichen handler arbeiten kann
+              if (node.data.input) {
+                const hiddenNode = prevNodes.find(n => n.id === `${id}-hidden`);
+                if (hiddenNode) {
+                  return [
+                    { ...hiddenNode, id: `${newLabel}-hidden` },
+                    newNode
+                  ];
+                }
+              }
+              return newNode;
+            } else if (node.id === `${id}-hidden`) {
+              return { ...node, id: `${newLabel}-hidden` };
+            }
+            return node;
+          }).flat() // danke für .flat
       );
 
-      // Aktualisiere die Kanten, um die neue Knoten-ID zu reffen
+      //auch neue edges dafür schlauer schachteln geht irg wie nicht
       setEdges((prevEdges) =>
-          prevEdges.map((edge) => ({
-            ...edge,
-            source: edge.source === id ? newLabel : edge.source,
-            target: edge.target === id ? newLabel : edge.target,
-          }))
+          prevEdges.map((edge) => {
+            if (edge.source === id) {
+              return { ...edge, source: newLabel };
+            } else if (edge.target === id) {
+              return { ...edge, target: newLabel };
+            } else if (edge.source === `${id}-hidden`) {
+              return { ...edge, source: `${newLabel}-hidden` };
+            }
+            return edge;
+          })
       );
     }
   }, [id, setNodes, setEdges]);
+
 
 
   return (
@@ -212,12 +238,15 @@ export default function NodeContextMenu({
       <p style={{ margin: '0.5em' }}>
         <small>Zustand: {id}</small>
       </p>
-      <button onClick={duplicateNode}>Neuer Zustand </button>
-      <button onClick={deleteNode}>Zustand Löschen</button>
+
       <button onClick ={renameNode}>Zustand Umbenennen</button>
       <button onClick={defaultNode}>Standard Zustand</button>
-      <button onClick = {changeToInputNode}>Startzustand umschalten</button>
+
       <button onClick = {changeToOutputNode}>Endzustand umschalten</button>
+      <button onClick={deleteNode}>Zustand Löschen</button>
     </div>
   );
 }
+//<button onClick = {changeToInputNode}>Startzustand umschalten</button>
+//<button onClick={duplicateNode}>Neuer Zustand </button>
+// <button onClick={duplicateNode}>Neuer Zustand </button>

@@ -100,7 +100,7 @@ export default function EdgeContextMenu({
                 </div>
             )}
 
-            <button onClick ={renameEdge}>Symbol ändern</button>
+            <button onClick ={renameEdge}>Übergang ändern</button>
             <button onClick ={deleteEdge}>Übergang Löschen</button>
 
 
