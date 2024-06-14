@@ -8,16 +8,20 @@ export default () => {
 
     return (
         <aside className= "dndflow">
-            <div className="description">Zustände mit Drag&Drop hinzufügen: </div>
+            <div className="SidebarDescription" >
+
+                    Drag & Drop Zustände hinzufügen:
+
+            </div>
 
             <div className="dndnode" onDragStart={(event) => onDragStart(event, 'default')} draggable>
-                Neuer Zustand
+                Zustand
             </div>
             <div className="dndnode" onDragStart={(event) => onDragStart(event, 'input')} draggable>
-                Neuer Input
+                Input
             </div>
             <div className="dndnode" onDragStart={(event) => onDragStart(event, 'output')} draggable>
-                Neuer Output
+                Output
             </div>
 
         </aside>

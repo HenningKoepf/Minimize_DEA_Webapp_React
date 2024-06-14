@@ -5,7 +5,6 @@ import ReactFlow, {
   Background,
   useNodesState,
   useEdgesState,
-
   addEdge,
     BaseEdge,
     Connection,
@@ -16,7 +15,7 @@ import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
 import { ReactFlowProvider } from 'react-flow-renderer'
 import 'reactflow/dist/style.css';
 import './styles/styles.css'
-import './updatenode.css';
+
 
 import NodeContextMenu from './components/NodeContextMenu';
 import EdgeContextMenu from './components/EdgeContextMenu';
@@ -28,16 +27,16 @@ import Sidebar from './components/Sidebar';
 
 import {initialNodes, initialEdges} from './elements/initial-setup2';
 import {initialNodes3, initialEdges3} from './elements/initial-setup3';
-import {initialNode, noEdges} from './elements/ClearBoard';
 import {exampleNodes, exampleEdges} from './elements/exampleDFA';
 import {miniNodes, miniEdges} from './elements/mini-setup';
 import Partitioner from './components/Partitioner';
+
 import {findPartitionForState, findTargetState} from './components/Partitioner';
 
 import NodeLabelList from './components/NodeLabelList';
 
 const EdgeTypes = {
-    //buttonedge: ButtonEdge,
+
     selfconnecting: SelfConnectingEdge,
     custom: CustomEdge,
 
@@ -51,7 +50,7 @@ const NodeTypes = {
 function App() {
 
 
-    //State Listener
+    //Zustands Management
     const [edgemenu, setEdgeMenu] = useState(null);
     const [menu, setMenu] = useState(null);
 
@@ -61,7 +60,7 @@ function App() {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
 
-    const [alphabet, setAlphabet] = useState(['a', 'b']);
+    const [alphabet, setAlphabet] = useState([]);
 
     const [implyTrashStates, setImplyTrashStates] = useState(false);
 
@@ -468,6 +467,13 @@ function App() {
         const startStateId = startStates[0].id;
         const transitions = new Map();
 
+        const endStates = nodes.filter(node => node.data.output == true);
+        if (endStates.length == 0) {
+            console.error("Es muss mindestens einen Endzustand geben.");
+            alert("Es muss mindestens einen Endzustand geben.")
+            return false;
+        }
+
         // Initialisieren der Transitions Map mit leeren Sets
         nodes.forEach(node => {
             alphabet.forEach(symbol => {
@@ -499,10 +505,11 @@ function App() {
         // Überprüfung auf Vollständigkeit des DFA
         let isComplete = true;
         transitions.forEach((targetState, key) => {
-            if (targetState === null && !implyTrashStates) {
+            if (isComplete && targetState === null && !implyTrashStates) {
                 // Wenn implyTrashStates false ist und ein Übergang fehlt, ist der DFA nicht vollständig
                 alert("DFA ist nicht vollständig. Es fehlt der Übergang:" + key);
                 isComplete = false;
+
             }
         });
 
@@ -606,7 +613,7 @@ function App() {
     function partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol) {
         let newPartitions = [];
         let changed = false;
-        let changes = []; // Um Änderungen zu protokollieren
+        let changes = []; // Für die genauen Veränderungen, Objet wird in der renderHistory verwendet
 
         // Finde die Partition, die den Source-Knoten des ausgewählten Edge enthält
         const sourcePartition = partitions.find(partition =>
@@ -615,12 +622,13 @@ function App() {
 
         if (!sourcePartition) {
             // Falls die Source-Partition nicht gefunden wird, gib die ursprünglichen Partitionen zurück
+            //better safe than sorry
             return { partitions, changed: false };
         }
 
         let targetPartitionMap = new Map();
 
-        // Überprüfe nur die Partition, die die Source des ausgewählten Edge enthält für
+        // Überprüfe nur die Partition, die die Source des ausgewählten Edge enthält für symbol
         sourcePartition.forEach(node => {
             const target = findTargetState(node, selectedSymbol, edges);
 
@@ -659,7 +667,7 @@ function App() {
             }
         });
 
-        // Append to history with changes
+        // Appenden an die History
         if(partitionsHistory.length > 0){
             setPartitionsHistory(prevHistory => [
                 ...prevHistory,
@@ -698,6 +706,35 @@ function App() {
         setAlphabet(newAlphabet);
     };
 
+    /**
+     * Speichern der Konfiguration
+     */
+
+    const saveConfiguration = () => {
+        const configuration = {
+            nodes: nodes,
+            edges: edges,
+            alphabet: alphabet
+        };
+        localStorage.setItem('automatonConfiguration', JSON.stringify(configuration));
+        alert("Automat wird gespeichert!");
+    };
+
+    /**
+     *  Laden der Konfiguration
+     */
+
+    const loadConfiguration = () => {
+        const configuration = JSON.parse(localStorage.getItem('automatonConfiguration'));
+        if (configuration) {
+            setNodes(configuration.nodes);
+            setEdges(configuration.edges);
+            setAlphabet(configuration.alphabet);
+            alert("Gespeicherter Automat wird geladen!");
+        } else {
+            alert("Keine gespeicherte Konfiguration gefunden.");
+        }
+    };
 
     /**
      * neue partitioneung erzeugen
@@ -706,7 +743,7 @@ function App() {
 
 
     const handlePartitionerClick = () => {
-        setTriggerCalculation(true);  // Dies löst die Berechnung aus
+        setTriggerCalculation(true);  // Dies löst die automatische Berechnung aus und rendert erst mit Abschluss
     };
 
     /**
@@ -1011,38 +1048,46 @@ function App() {
         nodes.forEach(node => {
             if (node.data.input) {
                 const hiddenNodeId = `${node.id}-hidden`;
-                const hiddenNode = {
-                    id: hiddenNodeId,
-                    data: { label: `${node.id}-hidden` },
-                    position: { x: node.position.x - 50, y: node.position.y },
-                    sourcePosition: 'right',
-                    targetPosition: 'left',
-                    style: { visibility: 'hidden' },
-                    animated: false,
-                    updateable: false,
-                    connectable: false,
-                };
+                const hiddenEdgeId = `edge-${hiddenNodeId}-${node.id}`;
 
-                const hiddenEdge = {
-                    id: `edge-${hiddenNodeId}-${node.id}`,
-                    source: hiddenNodeId,
-                    target: node.id,
-                    label: '',
-                    markerEnd: { type: MarkerType.ArrowClosed },
-                    selectable: false,
+                // Überprüfe, ob der hiddenNode bereits existiert
+                const hiddenNodeExists = displayNodes.some(n => n.id === hiddenNodeId);
+                const hiddenEdgeExists = displayEdges.some(e => e.id === hiddenEdgeId);
 
-                    type: 'smoothstep',
-                    animated: false,
-                    selectable: false,
-                };
+                if (!hiddenNodeExists) {
+                    const hiddenNode = {
+                        id: hiddenNodeId,
+                        data: { label: `${node.id}-hidden` },
+                        position: { x: node.position.x - 50, y: node.position.y },
+                        sourcePosition: 'right',
+                        targetPosition: 'left',
+                        style: { visibility: 'hidden' },
+                        animated: false,
+                        updateable: false,
+                        connectable: false,
+                    };
+                    displayNodes.push(hiddenNode);
+                }
 
-                displayNodes.push(hiddenNode);
-                displayEdges.push(hiddenEdge);
+                if (!hiddenEdgeExists) {
+                    const hiddenEdge = {
+                        id: hiddenEdgeId,
+                        source: hiddenNodeId,
+                        target: node.id,
+                        label: '',
+                        markerEnd: { type: MarkerType.ArrowClosed },
+                        selectable: false,
+                        type: 'smoothstep',
+                        animated: false,
+                    };
+                    displayEdges.push(hiddenEdge);
+                }
             }
         });
 
         return { displayNodes, displayEdges };
     };
+
     /**
      * Zwischenspeichern der AnzeigeKnoten in useMemo
      */
@@ -1091,12 +1136,11 @@ function App() {
                       {`E = {${nodes.filter(node => node.style?.visibility !== 'hidden' && node.data.output).map((node) => node.data.label).join(", ")}}`}
                   </div>
 
-
                   <NodeLabelList nodes={nodes.filter(node => node.style?.visibility !== 'hidden')} edges = {edges}/>
 
                   <div className="examplebuttons">
                       <div className="dropdown">
-                          <button className="dropbtn">Beispielauswahl</button>
+                          <button className="dropbtn">Beispiele</button>
                           <div className="dropdown-content">
                               <button onClick={miniField}>Reset</button>
                               <button onClick={resetPage}>Beispiel 1</button>
@@ -1104,12 +1148,24 @@ function App() {
                               <button onClick={exampleField3}>Beispiel 3</button>
                           </div>
                       </div>
-                      <div>
-                          <label className="implyTrashStates" style={{ display: 'flex', alignItems: 'center', padding: '5px' }}>
-                              Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates} />
-                          </label>
+                      <div className="dropdown">
+                          <button className="dropbtn">Speicher</button>
+                          <div className="dropdown-content">
+                              <div className="controls">
+                                  <button onClick={saveConfiguration}>Automat speichern</button>
+                                  <button onClick={loadConfiguration}>Automat laden</button>
+                              </div>
+                          </div>
                       </div>
+
+
                   </div>
+
+                      <label className="implyTrashStates" >
+                          Müllzustand implizieren: <input type="checkbox" checked={implyTrashStates} onChange={toggleImplyTrashStates} />
+                      </label>
+
+
 
                   <div className="DFAContainer">
                       <button onClick={checkIsDFA}>Ist der konfigurierte Automat ein DFA?</button>
@@ -1172,22 +1228,20 @@ function App() {
         >
           <Controls />
 
-            <MiniMap pannable />
+            <MiniMap pannable
+            nodes={nodes.filter(node => !node.id.includes('hidden'))}/>
+
             <Background variant="dots" gap={15} size={1} />
             {menu && <NodeContextMenu onClick={onPaneClick} {...menu} />}
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
 
-
-
-                  <Sidebar />
+                  {isDFAMinimized !== true && (<Sidebar />)}
                   <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
-
-
                   <div className="finalFlowrenderer" style={{ height: '80vh', width: '95%' }}>
-
-                  {partitions && isDfaResult &&(
+                  {partitions && isDfaResult && (
                       <>
+
                       <h2 className="header">
                           {isDFAMinimized ? (
                               <>Erzeugter minimaler Automat:</>
@@ -1195,6 +1249,7 @@ function App() {
                               <>Erzeugter Automat:</>
                           )}
                       </h2>
+
                   <ReactFlow
                       ref={refFinal}
                       nodes={finalnodes.filter(node => !node.id.includes('hidden'))}
@@ -1207,7 +1262,6 @@ function App() {
                       nodesDraggable={false}
                       nodesConnectable={false}
                       elementsSelectable={false}
-
                       zoomOnScroll={false}
                       zoomOnDoubleClick={false}
                   >
@@ -1216,7 +1270,6 @@ function App() {
                           showInteractive ={false}/>
                   </ReactFlow>
                       </>
-
 
                   )}
 

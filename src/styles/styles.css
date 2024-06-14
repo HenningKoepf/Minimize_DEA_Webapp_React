@@ -1,17 +1,16 @@
 .App {
   display: flex;
-  flex-direction: row; /* Anordnung der Inhalte in Spalten */
-  align-items: flex-start; /* Horizontale Ausrichtung */
+  flex-direction: row;
+  align-items: flex-start;
   justify-content: start;
 }
 
 .reactFlowsContainer {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* Stellt sicher, dass die Kinder in der Breite angepasst werden */
+  align-items: stretch;
   width: calc(100vw - 20px); /* Passt die Breite an, abzüglich des Margins */
 }
-
 
 
 .alphabet {
@@ -38,6 +37,7 @@ font-weight: bold;
 .context-menu button:hover {
   background: white;
 }
+
 .react-flow__basenode {
   display: flex;
   align-items: center;
@@ -64,78 +64,15 @@ font-weight: bold;
   line-height: 25px;
    */
 }
-/*
-Dicker Rand für Endzustand
- */
-/* Regel für Nodes mit zwei Rahmenlinien */
-.react-flow__node[className = outputNode] {
-  background: lightgreen; /* Hintergrundfarbe anpassen */
-  font-weight: bold; /* Schriftart anpassen */
-  position: relative; /* Position relativ setzen */
-  border-radius: 50%;
-}
 
 
 
-/* Erste Rahmenlinie */
-.react-flow__node[data-output= true]::before {
-  content: '';
-  position: absolute;
-  top: -2px; /* Abstand von oben */
-  left: -2px; /* Abstand von links */
-  right: -2px; /* Abstand von rechts */
-  bottom: -2px; /* Abstand von unten */
-  border: 1px solid black; /* Erste Rahmenlinie */
-  border-radius: 50%;
-}
-/* Zweite Rahmenlinie */
-.react-flow__node[data-output= true]::after {
-  content: '';
-  position: absolute;
-  top: -5px; /* Abstand von oben */
-  left: -5px; /* Abstand von links */
-  right: -5px; /* Abstand von rechts */
-  bottom: -5px; /* Abstand von unten */
-  border: 1px solid black; /* Zweite Rahmenlinie */
-  border-radius: 50%;
-  z-index: -1; /* Hinter die erste Rahmenlinie legen */
-}
 
-.react-flow__node[data-input= true] {
-  border: 2px solid black;
-  background: lightgreen;
-}
-
-/* Regel für den Pfeil am Knoten mit ID "input" */
-
-.react-flow__node[data-input= true]::before {
-  content: ''; /* Leerer Inhalt */
-  position: absolute; /* Absolute Positionierung relativ zum Elternelement */
-  top: 50%; /* Vertikale Ausrichtung auf 50% des Knotens */
-  left: -10px; /* Horizontaler Abstand zum Knoten */
-  border: solid transparent; /* Transparenter Rand */
-  border-radius: 50%;
-  width: 0;
-  height: 0;
-  transform: translateY(-50%); /* Vertikale Ausrichtung zentrieren */
-}
-.react-flow__node[data-input= true]::after {
-  content: ''; /* Leerer Inhalt */
-  position: absolute; /* Absolute Positionierung relativ zum Elternelement */
-  top: 50%; /* Vertikale Ausrichtung auf 50% des Knotens */
-  left: -10px; /* Horizontaler Abstand zum Knoten */
-  border-radius: 50%;
-  border: 5px solid transparent;
-  border-left-color: #555;
-  width: 0;
-  height: 0;
-  transform: translateY(-50%);
-}
 
 
 
 .react-flow{
-  height: 50%  !important;
+  height: 60%  !important;
   width: 100%;
   border: 1px solid lightgray;
   border-radius: 5px;
@@ -162,15 +99,13 @@ Dicker Rand für Endzustand
 
 .Kontrollcontainer{
   border: 1px solid lightgray;
-
   width: 30vh;
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 10px;
-
-  flex-direction: column; /* Anordnung der Inhalte in Spalten */
-  align-items: flex-start; /* Horizontale Ausrichtung */
-  justify-content: flex-start; /* Vertikale Ausrichtung */
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 .Kontrollcontainer label {
   font-weight: bold;
@@ -178,7 +113,6 @@ Dicker Rand für Endzustand
 }
 
 .Kontrollcontainer input {
-  width: 100%;
   border: 1px solid #ccc;
   border-radius: 3px;
   font-weight: bold;
@@ -190,12 +124,12 @@ Dicker Rand für Endzustand
 }
 
 .Kontrollcontainer .alphabet {
-  font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
+  font-family: monospace;
   margin-top: 10px;
 
 }
 .Kontrollcontainer .zustände {
-  font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
+  font-family: monospace;
   margin-top: 5px;
   font-weight: bold;
 }
@@ -251,12 +185,12 @@ Dicker Rand für Endzustand
 }
 
 .Kontrollcontainer .IfMinimizedDFA.false{
-  background-color: #dc3545; /* Rot für "Nein" */
+  background-color: red; /* Rot für "Nein" */
   color: black;
 }
 
 .Kontrollcontainer .IfMinimizedDFA.true {
-  background-color: #28a745; /* Grün für "Ja" */
+  background-color: green; /* Grün für "Ja" */
   color: black;
 }
 
@@ -343,16 +277,14 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .header {
-  font-size: 18px; /* Kleinere Schriftgröße */
-  color: #333;
-  margin-bottom: 5px; /* Reduzierter Abstand */
+  font-size: 18px;
+  margin-bottom: 5px;
 }
 
 .subHeader {
-  font-size: 14px; /* Kleinere Schriftgröße */
-  color: #666;
+  font-size: 14px;
   margin-top: 5px;
-  margin-bottom: 2px; /* Reduzierter Abstand */
+  margin-bottom: 2px;
 }
 
 .partition-history {
@@ -367,7 +299,7 @@ Anzeige der bisherigen Partitionen scrollbar
   flex-direction: row;
 }
 .history-entry.hover .step-number {
-  font-weight: bold; /* Macht den Text fett */
+  font-weight: bold;
 }
 
 .partition-row {
@@ -375,8 +307,8 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .partition {
-  padding: 0 10px; /* Anpassen für Abstand zwischen Partitionen */
-  border-right: 1px solid black; /* Linie zwischen Partitionen */
+  padding: 0 10px;
+  border-right: 1px solid black;
 }
 
 .partition:last-child {
@@ -384,53 +316,53 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .symbol {
-  padding-left: 10px; /* Abstand zwischen Partitionen und Symbol */
+  padding-left: 10px;
   white-space: nowrap; /* Verhindert Zeilenumbruch bei Symbolen */
 }
 
 .step-number {
-  padding-right: 10px; /* Abstand vor der Schritt-Nummer */
+  padding-right: 10px;
 }
 
-/* Styles für den Input pfeil*/
-.input-arrow {
-  position: absolute;
-  left: -20px;
-  top: 50%; /* vl noch position anpassen*/
-  transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
-}
 
-.input-arrow::after {
-  content: '';
-  display: block;
-  width: 0;
-  height: 0;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-right: 10px solid black;
-}
 .examplebuttons{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }
-.partition-history .partitionHistoryColumn {
-  border: 1px solid #ccc; /* Farbe und Dicke des Rahmens anpassen */
-  padding: 10px; /* Abstand zwischen Rahmen und Inhalt */
-  margin-bottom: 10px; /* Abstand zwischen Elementen */
+
+.SidebarDescription{
+  font-weight: bold;
 }
 
-.examplebuttons {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+
+
+.partition-history .partitionHistoryColumn {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
 }
+
+
+.implyTrashStates{
+  display: flex;
+  width: fit-content;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.implyTrashStates .checkbox{
+  display: flex;
+  align-items: center;
+
+}
+
 
 .dropdown {
   position: relative;
   display: inline-block;
+  padding-right: 10px;
+
 }
 
 .dropbtn {
@@ -486,6 +418,7 @@ Anzeige der bisherigen Partitionen scrollbar
   display: flex;
   flex-grow: 1;
   align-items: center;
+  font-size: 14px;
 
 }
 
@@ -502,6 +435,7 @@ Anzeige der bisherigen Partitionen scrollbar
 
 .dndflow .dndnode {
   height: 20px;
+  width: 80px;
   padding: 4px;
   border: 1px solid green;
   border-radius: 2px;
@@ -530,6 +464,8 @@ Anzeige der bisherigen Partitionen scrollbar
 .dndflow .selectall {
   margin-top: 10px;
 }
+
+/*Für die Anzeige bei Endgeräte mit kleiner Auflösung*/
 
 @media screen and (min-width: 768px) {
   .dndflow {
