@@ -36,10 +36,8 @@ import {findPartitionForState, findTargetState} from './components/Partitioner';
 import NodeLabelList from './components/NodeLabelList';
 
 const EdgeTypes = {
-
     selfconnecting: SelfConnectingEdge,
     custom: CustomEdge,
-
 };
 
 const NodeTypes = {

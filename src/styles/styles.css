@@ -185,12 +185,12 @@ font-weight: bold;
 }
 
 .Kontrollcontainer .IfMinimizedDFA.false{
-  background-color: red; /* Rot für "Nein" */
+  background-color: #dc3545; /* Rot für "Nein" */
   color: black;
 }
 
 .Kontrollcontainer .IfMinimizedDFA.true {
-  background-color: green; /* Grün für "Ja" */
+  background-color: #28a745; /* Grün für "Ja" */
   color: black;
 }
 
@@ -204,7 +204,7 @@ font-weight: bold;
 
 /* Stil für True */
 .DFAAnzeige.true {
-  color: green;
+  color: #28a745;
 }
 
 /* Stil für False */
@@ -212,7 +212,7 @@ font-weight: bold;
   color: red;
 }
 .IfMinimizedDFA.true {
-  color: green;
+  color: #28a745;
 }
 
 /* Stil für False */

@@ -10,7 +10,7 @@ export default () => {
         <aside className= "dndflow">
             <div className="SidebarDescription" >
 
-                    Drag & Drop Zustände hinzufügen:
+                Zustände mit Drag & Drop hinzufügen:
 
             </div>
 
