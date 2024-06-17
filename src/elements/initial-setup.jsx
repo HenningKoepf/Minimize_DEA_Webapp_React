@@ -16,7 +16,7 @@ export const initialNodes: Node[] = [
     },
     {
         id: 'Z1',
-        style: {backgroundColor: '#5a4eab'},
+        style: {backgroundColor: '#007bff'},
         data: { label: 'Z1' , input: true},
         position: { x: 100, y: 50 },
         sourcePosition: 'right',

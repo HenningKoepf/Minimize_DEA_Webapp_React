@@ -5,7 +5,7 @@ export const exampleNodes: Node[] = [
         id: 'Z0',
         data: { label: 'Z0', input: true },
         position: { x: 50, y: 120 },
-        style: {backgroundColor: '#a4d36b'},
+        style: {backgroundColor: '#007bff'},
         targetPosition: 'left',
         sourcePosition: 'right',
     },

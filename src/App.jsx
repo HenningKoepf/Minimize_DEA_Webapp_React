@@ -346,7 +346,7 @@ function App() {
                         position,
                         targetPosition: 'left',
                         sourcePosition: 'right',
-                        style: { backgroundColor: '#a4d36b' },
+                        style: { backgroundColor: '#007bff' },
                     };
 
                     break;
