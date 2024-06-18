@@ -17,6 +17,7 @@ import 'reactflow/dist/style.css';
 import './styles/styles.css'
 
 
+
 import NodeContextMenu from './components/NodeContextMenu';
 import EdgeContextMenu from './components/EdgeContextMenu';
 import SelfConnectingEdge from './elements/SelfConnectingEdge';
@@ -34,6 +35,8 @@ import Partitioner from './components/Partitioner';
 import {findPartitionForState, findTargetState} from './components/Partitioner';
 
 import NodeLabelList from './components/NodeLabelList';
+
+
 
 const EdgeTypes = {
     selfconnecting: SelfConnectingEdge,
@@ -93,6 +96,20 @@ function App() {
         setEdges(prev => initialEdges3);
 
     }
+
+    const updatePos = useCallback(() => {
+        setNodes((nds) => {
+            return nds.map((node) => {
+                return {
+                    ...node,
+                    position: {
+                        x: Math.random() * 800,
+                        y: Math.random() * 800,
+                    },
+                };
+            });
+        });
+    }, []);
 
     //Erzeut die Startpartitionen mit Endzuständen und restlichen Zuständen
     const initialPartition = (nodes) => {
@@ -896,7 +913,7 @@ function App() {
 
             let style = {};
             if (isInput) {
-                style.backgroundColor = '#a4d36b';
+                style.backgroundColor = '#007bff';
             }
             if (isOutput) {
                 style.border = "3px solid black";
@@ -906,7 +923,7 @@ function App() {
                 // Kombiniertes styling für Knoten, die sowohl Input als auch Output sind
                     style.border = "3px solid black" ;
                     style.borderStyle= "double";
-                    style.backgroundColor = '#a4d36b';
+                    style.backgroundColor = '#007bff';
                 }
 
             const newNode = {
@@ -1230,6 +1247,8 @@ function App() {
             nodes={nodes.filter(node => !node.id.includes('hidden'))}/>
 
             <Background variant="dots" gap={15} size={1} />
+
+
             {menu && <NodeContextMenu onClick={onPaneClick} {...menu} />}
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
@@ -1266,6 +1285,7 @@ function App() {
                       <Controls
                           showZoom = {false}
                           showInteractive ={false}/>
+
                   </ReactFlow>
                       </>
 
