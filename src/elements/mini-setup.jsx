@@ -8,7 +8,7 @@ export const miniNodes: Node[] = [
 
     {
         id: 'Z1',
-        style: {backgroundColor: '#a4d36b' },
+        style: {backgroundColor: '#007bff' },
         data: { label: 'Z1' , input: true},
         position: { x: 100, y: 100 },
         sourcePosition: 'right',

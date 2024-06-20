@@ -173,7 +173,7 @@ const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setParti
                 <></>
             ) : (
                 <>
-                    <button onClick={handleCalculateClick} style={{ width: "250px" }}>Berechnung automatisch durchführen</button>
+                    <button onClick={handleCalculateClick} style={{ width: "250px" }}>Minimierung automatisch durchführen</button>
                     <h3>Zustandsklassen</h3>
                 </>
             )}

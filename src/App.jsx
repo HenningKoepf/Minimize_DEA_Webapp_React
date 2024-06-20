@@ -333,10 +333,14 @@ function App() {
                 return;
             }
 
-            const newLabel = prompt("Bitte geben Sie das Label für den neuen Zustand ein:");
+            const newLabel = prompt("Bitte Bezeichner für neuen Zustand eingeben:");
             if (!newLabel) {
-                // Abbrechen, wenn kein Label eingegeben wurde
+                // Abbruch
                 return;
+            }
+            if (nodes.some(node => node.data.label === newLabel)) {
+                alert('Dieser Zustand existiert bereits!');
+                return; // Abbruch
             }
 
             const position = reactFlowInstance.screenToFlowPosition({
@@ -391,7 +395,7 @@ function App() {
 
             setNodes((nds) => nds.concat(newNode));
         },
-        [reactFlowInstance],
+        [reactFlowInstance, nodes],
     );
 
 
@@ -1137,7 +1141,7 @@ function App() {
 
     return (
       <>
-     <div className="toptext" ref={topTextRef} >D F A ---  M I N I M I E R E R ! </div>
+     <div className="toptext" ref={topTextRef} >D E A ---  M I N I M I E R E R ! </div>
 
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
@@ -1183,7 +1187,7 @@ function App() {
 
 
                   <div className="DFAContainer">
-                      <button onClick={checkIsDFA}>Ist der konfigurierte Automat ein DFA?</button>
+                      <button onClick={checkIsDFA}>Ist der konfigurierte Automat ein DEA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
