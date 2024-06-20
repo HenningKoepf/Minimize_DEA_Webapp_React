@@ -538,7 +538,7 @@ function App() {
             return false;
         }
 
-        // Überprüfung der Erreichbarkeit aller Zustände naja... still to debug
+        // Überprüfung der Erreichbarkeit aller Zustände naja... still to debug..got it :D
         let visited = new Set();
         let queue = [startStateId];
         while (queue.length > 0) {
@@ -556,7 +556,7 @@ function App() {
         }
 
         if (visited.size !== nodes.length) {
-            console.error("Nicht alle Zustände sind erreichbar.");
+            alert("Nicht alle Zustände sind erreichbar.");
             return false;
         }
 
@@ -1257,7 +1257,7 @@ function App() {
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
 
-                  {isDFAMinimized !== true && (<Sidebar />)}
+                  {isDfaResult !== true && (<Sidebar />)}
                   <div className= "bottomdiv" style={{ display: 'flex', flexDirection: 'row' }}>
                   <div className="finalFlowrenderer" style={{ height: '80vh', width: '95%' }}>
                   {partitions && isDfaResult && (
