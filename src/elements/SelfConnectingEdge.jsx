@@ -24,8 +24,8 @@ export default function SelfConnecting(props: BaseEdgeProps){
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             fontSize: 12,
-            // everything inside EdgeLabelRenderer has no pointer events by default
-            // if you have an interactive element, set pointer-events: all
+
+
             pointerEvents: 'all',
           }}
           className="nodrag nopan"

@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback} from 'react';
 import { useReactFlow } from 'reactflow';
 
 
@@ -36,7 +36,7 @@ export default function EdgeContextMenu({
         /*
         TODO: Inputform statt window.prompt
         */
-        const newLabel = window.prompt("Geben Sie den neuen Namen für die Kante ein:", "");
+        const newLabel = window.prompt("Geben Sie neue Übergangssymbole ein:", "");
 
         if (newLabel !== null) {
             setEdges((edges) =>

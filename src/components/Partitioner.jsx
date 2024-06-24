@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { useReactFlow } from 'reactflow';
 
@@ -43,16 +43,6 @@ export function findPartitionForState(target, partitions) {
     return null;
 }
 
-/**
- * Ausgabeformatierung der Partitionen
- * @param partitions
- * @returns {*}
- */
-const formatPartitions = (partitions) => {
-    return partitions.map(partition =>
-        partition.map(node => node.data.label).join(' ')
-    ).join(' | ');
-};
 
 /**
  * Hier findet die eigentliche Logik der Partitionstabelle statt

@@ -5,14 +5,9 @@ import ReactFlow, {
   Background,
   useNodesState,
   useEdgesState,
-  addEdge,
-    BaseEdge,
-    Connection,
-    ConnectionMode,
-    Node, MarkerType
+  MarkerType
 } from 'reactflow';
-import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
-import { ReactFlowProvider } from 'react-flow-renderer'
+
 import 'reactflow/dist/style.css';
 import './styles/styles.css'
 
@@ -126,7 +121,7 @@ function App() {
     const [finaledges, setfinalEdges, onfinalEdgesChange] = useEdgesState([]);
 
     // States für die Anzeige der History mit Details
-    const [showDetails, setShowDetails] = useState(false);
+
     const [detailsVisibility, setDetailsVisibility] = useState({}); // State für das Ein-/Ausblenden der Details
     const [miniKonfigVisibility, setMiniKonfigVisibility] = useState(false);
 
@@ -477,7 +472,7 @@ function App() {
         }
 
         // Überprüfung auf genau einen Startzustand
-        const startStates = nodes.filter(node => node.data.input == true);
+        const startStates = nodes.filter(node => node.data.input === true);
         if (startStates.length !== 1) {
             console.error("Es muss genau einen Startzustand geben.");
             alert("Es muss genau einen Startzustand geben.")
@@ -486,8 +481,8 @@ function App() {
         const startStateId = startStates[0].id;
         const transitions = new Map();
 
-        const endStates = nodes.filter(node => node.data.output == true);
-        if (endStates.length == 0) {
+        const endStates = nodes.filter(node => node.data.output === true);
+        if (endStates.length === 0) {
             console.error("Es muss mindestens einen Endzustand geben.");
             alert("Es muss mindestens einen Endzustand geben.")
             return false;
@@ -707,26 +702,9 @@ function App() {
 
 
 
-    /**
-     * Aktualisieren des aktuell akzeptiereten Alphabets
-     * @param newAlphabet
-     */
-    const [inputAlphabet, setInputAlphabet] = useState(alphabet.join(', '));
-    const handleAlphabetInput = (e) => {
-        setInputAlphabet(e.target.value);
-        updateAlphabet(e.target.value);
-    }
-    /**
-     * Inputbox und alphabet stimmen immer überein
-     * @param inputValue
-     */
-    const updateAlphabet = (inputValue) => {
-        const newAlphabet = inputValue.split(/[;,]\s*|\s+/).map(symbol => symbol.trim()).filter((symbol, index, array) => array.indexOf(symbol) === index);
-        setAlphabet(newAlphabet);
-    };
 
     /**
-     * Speichern der Konfiguration
+     * Speichern der Konfiguration im Browser des Clients
      */
 
     const saveConfiguration = () => {
@@ -740,7 +718,7 @@ function App() {
     };
 
     /**
-     *  Laden der Konfiguration
+     *  Laden der Konfiguration des Automaten
      */
 
     const loadConfiguration = () => {
@@ -751,12 +729,12 @@ function App() {
             setAlphabet(configuration.alphabet);
             alert("Gespeicherter Automat wird geladen!");
         } else {
-            alert("Keine gespeicherte Konfiguration gefunden.");
+            alert("Keine gespeicherter Automat gefunden.");
         }
     };
 
     /**
-     * neue partitioneung erzeugen
+     * neue partitioneung erzeugen ermöglichen
      */
     const [triggerCalculation, setTriggerCalculation] = useState(false);
 
@@ -766,7 +744,7 @@ function App() {
     };
 
     /**
-     * Button zum Neuladen der Website
+     * Button zum Neuladen der Website obsolete
      */
     const resetPage = () =>{
         window.location.reload();
@@ -798,7 +776,7 @@ function App() {
 
 
 
-    /** Hilfsfunktion zum Prüfen ob der Automat schon minimal is, erzeugt ergebnis von automaticher berechnung für
+    /** Hilfsfunktion zum Prüfen ob der Automat schon minimal is, erzeugt das ergebnis von automaticher berechnung für
      * Vergleich mit aktuell erzeugtem Automaten
      *
      */
@@ -887,7 +865,7 @@ function App() {
 
 
     /**
-     * Kreation des Äquivalenzautomaten basierend auf den aktuellen Partitionen
+     * Kreation des erzeugten Automaten basierend auf der aktuellen Partition
      * @param partitions
      * @returns {{newEdges: *[], newNodes: *[]}}
      */
@@ -895,7 +873,7 @@ function App() {
         createMinimizedGraph();
         setIsDFAMinimized(null);
 
-    }, [partitions]); // Abhängigkeit von der existenz der Partitionen
+    }, [partitions]);
 
 
     const createMinimizedGraph = () => {
@@ -904,12 +882,12 @@ function App() {
         const partitionMap = {}; // Mapt die alten Knoten-IDs auf neue Knoten-IDs
         const edgeLabelsMap = {}; // Mapts Labels für Kanten zwischen Partitionen
 
-        // Schritt 1: Neue Knoten erstellen
+
         partitions.forEach((partition, index) => {
             if (partition.length === 0) {
-                //edge case wenn input= output und keine anderen Knoten verfügbar
+                //edge case
                 console.error("Leere Partition entdeckt, überspringe diese Partition.");
-                return; //die partition wird übersprungen, da sie leer ist
+                return;
             }
 
             const isOutput = partition.some(node => node?.data?.output);
@@ -932,12 +910,12 @@ function App() {
 
             const newNode = {
 
-                id: `P${index}`, // Eindeutige ID für den neuen Knoten
+                id: `P${index}`, // Eindeutige ID für den erzeugten Knoten
                 data: { ...partition[0].data, label: "{" + partition.map(node => node.data.label).join(", ") +"}" },
                 position: calculateAveragePosition(partition, nodes),
                 targetPosition: 'left',
                 sourcePosition: 'right',
-                style: Object.keys(style).length > 0 ? style : undefined //entweder Style schon vorhanden, oder default node
+                style: Object.keys(style).length > 0 ? style : undefined //entweder Style schon vorhanden, oder default one
             };
 
             newNodes.push(newNode);
@@ -948,20 +926,20 @@ function App() {
             });
         });
 
-        // Schritt 2: Neue Kanten und deren Labels erstellen, einschließlich Selbstkanten
+        // Neue Kanten und deren Labels erstellen, einschließlich Selbstkanten
         edges.forEach(edge => {
             const sourcePartition = partitionMap[edge.source];
             const targetPartition = partitionMap[edge.target];
 
-            // Generiere einen einzigartigen Schlüssel für jede Kantenverbindung zwischen Partitionen
+            // Key für jede Kantenverbindung zwischen Partitionen
             const edgeKey = `${sourcePartition}->${targetPartition}`;
-            // Initialisiere das Label für die Kante, falls noch nicht geschehen
+            // initialisieren
             if (!edgeLabelsMap[edgeKey]) {
                 edgeLabelsMap[edgeKey] = { labels: new Set(), type: null };
             }
 
 
-            const normalizedLabel = edge.label.replace(/,\s*/g, " "); // Ersetzt Kommas und darauf folgende Leerzeichen durch ein Leerzeichen
+            const normalizedLabel = edge.label.replace(/,\s*/g, " ");
             normalizedLabel.split(" ").forEach(label => edgeLabelsMap[edgeKey].labels.add(label)); //keine dupletten
 
 
@@ -981,7 +959,7 @@ function App() {
         //  neue Kanten basierend auf edgeLabelsMap, einschließlich Selbstkanten
         Object.keys(edgeLabelsMap).forEach((key, index) => {
             const [source, target] = key.split('->');
-            // Konvertiere das Set von Labels zurück in einen String, getrennt durch Leerzeichen
+            // Strings statt Sets als label
             const labelsString = Array.from(edgeLabelsMap[key].labels).join(" ");
             const newEdge = {
                 id: `e${index}`,
@@ -998,9 +976,10 @@ function App() {
         setfinalEdges(newEdges);
     };
 
+
     const onNodeDrag = useCallback(
         (event, node) => {
-            if (node.data.input === true) {
+            if (node.data.input === true) { //Eingehender Pfeil schwebt von einem unsichtbaren Knoten aus
                 const hiddenNodeId = `${node.id}-hidden`;
                 setNodes((nds) =>
                     nds.map((n) => {
@@ -1024,6 +1003,7 @@ function App() {
 
     /**
      * Automatische Berechnung der Positionen der Zustände des erzeugten Graphen
+     * Harmonisiert mit gelöschten Positionen
      * @param partition
      * @param originalNodes
      * @returns {{x: number, y: number}}
@@ -1032,19 +1012,18 @@ function App() {
     function calculateAveragePosition(partition, originalNodes) {
         const positions = partition.map(node => {
             const originalNode = originalNodes.find(n => n.id === node.id);
-            if (!originalNode) {
+            if (!originalNode) {// wieder edge case
                 alert(`Knoten mit ID ${node.id} nicht gefunden.`);
-
             }
             else{
 
                 return originalNode.position;
             }
-        }).filter(pos => pos !== null); // Filtere ungültige Positionen heraus
+        }).filter(pos => pos !== null);
 
         if (positions.length === 0) {
             console.error('Keine gültigen Positionen gefunden');
-            return { x: 0, y: 0 }; // Setze eine Standardposition
+            return { x: 0, y: 0 }; // Setze einfach standart
         }
 
         const averagePosition = {
