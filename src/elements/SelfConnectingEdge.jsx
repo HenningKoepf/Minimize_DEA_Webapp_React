@@ -4,7 +4,7 @@ import { BaseEdge, BaseEdgeProps, EdgeLabelRenderer,  } from 'reactflow';
 export default function SelfConnecting(props: BaseEdgeProps){
 
 
-  const { sourceX, sourceY, targetX, targetY, id, markerEnd, label,style } = props;
+  const { sourceX, sourceY, targetX, targetY, markerEnd, label,style } = props;
   const radiusX = (sourceX - targetX) * 0.5;
   const radiusY = 40;
   const edgePath = `M ${sourceX - 5} ${sourceY} A ${radiusX} ${radiusY} 0 1 0 ${

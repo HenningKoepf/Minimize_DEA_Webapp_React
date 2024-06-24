@@ -16,7 +16,7 @@ import './styles/styles.css'
 import NodeContextMenu from './components/NodeContextMenu';
 import EdgeContextMenu from './components/EdgeContextMenu';
 import SelfConnectingEdge from './elements/SelfConnectingEdge';
-import CustomEdge from './components/CustomEdge';
+import CustomEdge from './elements/CustomEdge';
 import BaseNode from './elements/BaseNode';
 import Sidebar from './components/Sidebar';
 
@@ -32,7 +32,7 @@ import {findPartitionForState, findTargetState} from './components/Partitioner';
 import NodeLabelList from './components/NodeLabelList';
 
 
-
+//Zus#tzlich zum Default fall
 const EdgeTypes = {
     selfconnecting: SelfConnectingEdge,
     custom: CustomEdge,
@@ -60,7 +60,7 @@ function App() {
 
     const [implyTrashStates, setImplyTrashStates] = useState(false);
 
-    //umschalten ob Müllzustände impliziert werden "true" oder nicht "false"
+    //umschalten ob Müllzustände impliziert werden
     const toggleImplyTrashStates = () => {
         setImplyTrashStates(!implyTrashStates);
     };
@@ -92,26 +92,17 @@ function App() {
 
     }
 
-    const updatePos = useCallback(() => {
-        setNodes((nds) => {
-            return nds.map((node) => {
-                return {
-                    ...node,
-                    position: {
-                        x: Math.random() * 800,
-                        y: Math.random() * 800,
-                    },
-                };
-            });
-        });
-    }, []);
-
-    //Erzeut die Startpartitionen mit Endzuständen und restlichen Zuständen
+    /**
+     * Erzeugt die Starttrennung zwischen Zuständen und Endzuständen
+     * @param nodes
+     * @returns {[*,*]}
+     */
     const initialPartition = (nodes) => {
         const endStates = nodes.filter(node => node.data.output);
         const nonEndStates = nodes.filter(node => !node.data.output);
         return [nonEndStates, endStates];
     };
+
 
     const [partitions, setPartitions] = useState(initialPartition(nodes));
     const [partitionsHistory, setPartitionsHistory] = useState([]);
@@ -135,6 +126,7 @@ function App() {
 
     //infobox how to
     const [showHowTo, setShowHowTo] = useState(false);
+
 
     /**
      * das Alphabet soll automatisch aktualisiert werden, sobald neue symbole hinzukommen!
@@ -234,9 +226,6 @@ function App() {
                 // limit die linke Position mit Breite des Kontrollcontainer
                 const top = Math.min(clickY -topTextHeight, pane.height -topTextHeight - 200);
                 //hover enhanced
-
-
-
                 setEdgeMenu({
                     className:"context-menu",
                 id: edge.id,
@@ -1220,7 +1209,7 @@ function App() {
 
                       {
                           isDFAMinimized === true && (<button onClick={() => toggleMiniKonfigVisibility()}>
-                              {miniKonfigVisibility ? 'Details ausblenden' : 'Details einblenden'}
+                              {miniKonfigVisibility ? 'Details ausblenden' : 'Details des Automaten einblenden'}
                           </button>)
                       }
                   {
@@ -1339,7 +1328,7 @@ function App() {
                                 )}
                                 <br/>
                                 {index === 0 && <><div className="step-number">Aufteilung in Zustände & Endzustände: </div> <br/> </>}
-                                {renderPartitionWithSymbol(historyEntry)}
+
                                 {historyEntry.changed && (
                                     <div>
                                         <button onClick={() => toggleDetailsVisibility(index)}>
@@ -1365,7 +1354,9 @@ function App() {
                                         )}
                                     </div>
                                 )}
-                                <div style={{ height: '15px' }}></div>
+                                <div style={{ height: '10px' }}></div>
+                                {renderPartitionWithSymbol(historyEntry)}
+
                             </div>
                         ))}
                     </div>

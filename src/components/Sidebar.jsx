@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default  () => {
+const Sidebar = () => {
     const onDragStart = (event, nodeType) => {
         event.dataTransfer.setData('application/reactflow', nodeType);
         event.dataTransfer.effectAllowed = 'move';
@@ -27,3 +27,4 @@ export default  () => {
         </aside>
     );
 };
+export default Sidebar;

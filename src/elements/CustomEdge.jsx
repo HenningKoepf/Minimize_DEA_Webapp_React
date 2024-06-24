@@ -1,6 +1,23 @@
 import React from 'react';
 import { getBezierPath, EdgeLabelRenderer } from 'reactflow';
 
+/**
+ *
+ *Im Falle von konkurierenden übereinanderliegende Edge-Labels
+ * @param id
+ * @param sourceX
+ * @param sourceY
+ * @param targetX
+ * @param targetY
+ * @param sourcePosition
+ * @param targetPosition
+ * @param style
+ * @param data
+ * @param arrowHeadType
+ * @param markerEnd
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 const CustomEdge = ({
                         id,

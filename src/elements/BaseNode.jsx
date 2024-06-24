@@ -1,8 +1,14 @@
-import React, { memo } from 'react';
-import ReactFlow, { useReactFlow,} from 'reactflow';
+import Reactfrom from 'react';
+import ReactFlow from 'reactflow';
 
+/**
+ * Standard Zustand als Grundelement nut mit Name und className
+ * @param data
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const BaseNode = ({ data }) => {
-    const { setNodes } = useReactFlow();
+
     const className = data.output ? "outputNode" : "basenode";
     return(
         <>

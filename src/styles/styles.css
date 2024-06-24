@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .reactFlowsContainer {
@@ -53,16 +53,9 @@ font-weight: bold;
   font-size: 8px;
   background: #eee;
   border: 1px solid #555;
-  /*
-
-  border-radius: 5px;
-   */
   border-radius: 50%;
   text-align: center;
   justify-content: center;
-  /*
-  line-height: 25px;
-   */
 }
 
 .react-flow{
@@ -87,7 +80,6 @@ font-weight: bold;
   font-family: "Apple Braille", serif;
   text-align: center;
 }
-
 
 
 .Kontrollcontainer{
@@ -116,7 +108,7 @@ font-weight: bold;
 
 }
 .howToButton {
-  width: 50%;
+  width: 80%;
 }
 .howToButton:hover, .howToButton:focus {
   background-color: #3e8e41;
@@ -218,13 +210,14 @@ font-weight: bold;
   align-items: flex-start;
 }
 
+/*
+Stile der Anzeige im true und false Fall
+ */
 
-/* Stil für True */
 .DFAAnzeige.true {
   color: #28a745;
 }
 
-/* Stil für False */
 .IfMinimizedDFA.false {
   color: red;
 }
@@ -232,7 +225,6 @@ font-weight: bold;
   color: #28a745;
 }
 
-/* Stil für False */
 .DFAAnzeige.false {
   color: red;
 }
@@ -240,6 +232,7 @@ font-weight: bold;
 /*
 Anzeige der bisherigen Partitionen scrollbar
  */
+
 .partition-history {
   list-style-type: n´;
   margin-top: 0;
@@ -334,7 +327,7 @@ Anzeige der bisherigen Partitionen scrollbar
 
 .symbol {
   padding-left: 10px;
-  white-space: nowrap; /* Verhindert Zeilenumbruch bei Symbolen */
+  white-space: nowrap;
 }
 
 .step-number {

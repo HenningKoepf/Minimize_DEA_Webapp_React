@@ -25,14 +25,15 @@ export default function NodeContextMenu({
   bottom,
   ...props
 }) {
-  const { getNode, setNodes, addNodes, setEdges } = useReactFlow();
-  const newHandlerId = Math.random();
+  const { setNodes, setEdges } = useReactFlow();
+
 
   /**
    * Funktion um einen neuen Knoten mit eigenen Handlers für neue Edges zu erstellen.
-   * Einzige möglichkeit um neue Knoten auf dem Pane und dem DOM hinzuzufügen
+   * Möglichkeit um neue Knoten auf dem Pane und dem DOM hinzuzufügen obsolete draganddrop
    * @type {(function(): void)|*}
    */
+  /*
   const duplicateNode = useCallback(() => {
     const node = getNode(id);
     const position = {
@@ -44,6 +45,8 @@ export default function NodeContextMenu({
 
     addNodes({ ...node,id: newNodeLabel, position, data:{ label: newNodeLabel}, style: {}});
   }, [id, getNode, addNodes]);
+
+   */
 
   /**
    * Knoten wird entfernt und jegliche damit zusammenhzängende Kanten werden aus dem DOM gelöscht
@@ -86,9 +89,10 @@ export default function NodeContextMenu({
 
 
   /**
-   * Funktion um einem Knoten den Zustand eines "Startzustandes" zu verpassen, inkl styling
+   * Funktion um einem Knoten den Zustand eines "Startzustandes" zu verpassen, inkl styling obsolet
    * @type {(function(): void)|*}
    */
+  /*
   const changeToInputNode = useCallback(() => {
     setNodes((nodes) =>
 
@@ -111,6 +115,8 @@ export default function NodeContextMenu({
         })
     );
   }, [id, setNodes]);
+
+   */
 
   /**
    * Funktion um einem Knoten den Zustand eines "Endzustandes" zu verpassen, inkl styling
@@ -145,7 +151,7 @@ export default function NodeContextMenu({
           return node;
         })
     );
-  }, [id, setNodes, getNode, addNodes]);
+  }, [id, setNodes]);
 
 
   const defaultNode = useCallback(() => {
@@ -249,4 +255,3 @@ export default function NodeContextMenu({
 }
 //<button onClick = {changeToInputNode}>Startzustand umschalten</button>
 //<button onClick={duplicateNode}>Neuer Zustand </button>
-// <button onClick={duplicateNode}>Neuer Zustand </button>
