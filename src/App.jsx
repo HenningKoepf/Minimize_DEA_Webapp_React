@@ -133,6 +133,9 @@ function App() {
     //States für MinimizedFinishedCheck
     const[isDFAMinimized, setIsDFAMinimized] = useState (false);
 
+    //infobox how to
+    const [showHowTo, setShowHowTo] = useState(false);
+
     /**
      * das Alphabet soll automatisch aktualisiert werden, sobald neue symbole hinzukommen!
      * Der versteckte Knoten mit dem ungelabelten Inputknoten ist davon ausgenommen
@@ -261,12 +264,12 @@ function App() {
 
     /**
      * Erzeugen einer Kante, wenn von einer Source Handle per DragnDrop zu einer TargetHandle gezogen wurde
-     * Erzeugt
+     *
      * @type {(function(*): void)|*}
      */
     const onConnect = useCallback(
         (params) => {
-            const label = prompt("Bitte geben Sie das Label für die neue Kante ein:", alphabet[0]);
+            const label = prompt("Bitte geben Sie Symbole für den neuen Übergang ein:", alphabet[0]);
 
             if (label !== null) {
                 if (params.source === params.target) {
@@ -870,13 +873,13 @@ function App() {
      * @returns {{newEdges: *[], newNodes: *[]}}
      */
     useEffect(() => {
-        createMinimizedGraph();
+        createMinimizedDFA();
         setIsDFAMinimized(null);
 
     }, [partitions]);
 
 
-    const createMinimizedGraph = () => {
+    const createMinimizedDFA = () => {
         const newNodes = [];
         const newEdges = [];
         const partitionMap = {}; // Mapt die alten Knoten-IDs auf neue Knoten-IDs
@@ -1039,7 +1042,7 @@ function App() {
      * @param edges
      * @returns {{displayEdges: *[], displayNodes: *[]}}
      */
-    const generateDisplayNodesAndEdges = (nodes, edges) => {
+    const createDisplayedNodesWithInputEdge = (nodes, edges) => {
         const displayNodes = [...nodes];
         const displayEdges = [...edges];
 
@@ -1087,13 +1090,13 @@ function App() {
     };
 
     /**
-     * Zwischenspeichern der AnzeigeKnoten in useMemo
+     * Zwischenspeichern der AnzeigeKnoten
      */
-    const { displayNodes, displayEdges } = useMemo(() => generateDisplayNodesAndEdges(nodes, edges), [nodes, edges]);
+    const { displayNodes, displayEdges } = useMemo(() => createDisplayedNodesWithInputEdge(nodes, edges), [nodes, edges]);
 
 
     /**
-     *  dynamisches Stylen der Edges als enhance edges mit  hover-based styling
+     *  Edges als enhance edges mit dem hover-based styling
      */
 
 
@@ -1124,6 +1127,39 @@ function App() {
 
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
+                  <button className="howToButton"
+                          onMouseEnter={() => setShowHowTo(true)}
+                          onMouseLeave={() => setShowHowTo(false)} >
+                      Anleitung
+                  </button>
+
+                  <div className={`howToContainer ${showHowTo ? 'active' : ''}`}>
+                      <h3>Konstruktion:</h3>
+                      <ul>
+                          <li>Durch Ziehen zwischen den Zuständen neue Übergänge erzeugen.</li>
+                          <li>Übergänge verlassen Zustände nach rechts und enden links. </li>
+                          <li>Mt dem Button überprüfen ob der konstruierte Automat ein korrekter DEA ist.</li>
+                          <li>Unvollständige Automaten werden nur mit "Müllzustand implizieren" akzeptiert. </li>
+                          <li>Über Rechtsklicks können Zustände und Übergänge weiter verändert werden. </li>
+                      </ul>
+                      <h3>Minimierung:</h3>
+                      <ul>
+                          <li>Es wird ein Automat mit zwei Zustandsklassen erzeugt. Je alle Zustände und alle Endzuständen sind verschmolzen.</li>
+                          <li>Ein Rechtsklick auf einen Übergang im oberen Automat öffnet ein Menü für den nächsten Schritt.</li>
+                          <li>Dort werden beim Hovern über die Symbole Übergänge im erzeugten Automat rot markiert. Ist dabei mehr als ein Übergang rot, gibt es einen Konflikt.
+                              Der erzeugte Automat ist nicht eindeutig. </li>
+                          <li>Dieser Konflikt wird durch eine Trennung der aktuellen Zustandsklassen gelöst.
+                              Im Protokoll daneben befinden sich jeweils Details und Begründung. </li>
+                          <li>Gibt es keine Konflikte mehr, ist der erzeugte Automat minimal. </li>
+                      </ul>
+                      <h3>Tipps:</h3>
+                      <ul>
+                          <li>Mit dem Schlosssymbl den Automaten vor unabsichtlicher Veränderung schützen.</li>
+                          <li>Beispiele als Ausgangsautomaten verwenden und speichern.</li>
+                          <li>Minimierung zuerst selbst und erst später automatisch durchführen.</li>
+
+                      </ul>
+                  </div>
                   <h3 className ="aktuelleKonfiguration"> Konfiguration des Automaten:</h3>
 
                   <div className="alphabet">{`Σ = {${alphabet.join(', ')}}`}</div>
@@ -1166,7 +1202,7 @@ function App() {
 
 
                   <div className="DFAContainer">
-                      <button onClick={checkIsDFA}>Ist der konfigurierte Automat ein DEA?</button>
+                      <button onClick={checkIsDFA}>Ist der konstruierte Automat ein DEA?</button>
                       <div className={`DFAAnzeige ${isDfaResult !== null ? (isDfaResult ? 'true' : 'false') : ''}`}>
                           {isDfaResult !== null && (<div>{isDfaResult ? 'Ja' : 'Nein'}</div>)}
                       </div>
@@ -1341,9 +1377,6 @@ function App() {
             </div>
           </div>
 
-          <footer className="footer">
-              <p><strong>&copy; 2024 Henning Köpf</strong> - <strong>Kontakt:</strong> ************@gmx.de</p>
-          </footer>
 
 
           </>

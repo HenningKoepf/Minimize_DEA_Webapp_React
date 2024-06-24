@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: calc(100vw - 20px); /* Passt die Breite an, abzüglich des Margins */
+  width: calc(100vw - 20px);
 }
 
 
@@ -65,12 +65,6 @@ font-weight: bold;
    */
 }
 
-
-
-
-
-
-
 .react-flow{
   height: 60%  !important;
   width: 100%;
@@ -87,7 +81,6 @@ font-weight: bold;
 .react-flow__panel.react-flow__attribution.bottom.right {
   display: none;
 }
-
 
 .toptext {
   font-size: 32px;
@@ -122,6 +115,12 @@ font-weight: bold;
   margin-top: 10px;
 
 }
+.howToButton {
+  width: 50%;
+}
+.howToButton:hover, .howToButton:focus {
+  background-color: #3e8e41;
+}
 
 .Kontrollcontainer .alphabet {
   font-family: monospace;
@@ -141,7 +140,7 @@ font-weight: bold;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px; /* Abstand zum vorherigen Element */
+  margin-top: 10px; /* leichet Abstand zum vorherigen Element */
 }
 
 .partitiondiv button {
@@ -175,25 +174,43 @@ font-weight: bold;
 }
 
 .Kontrollcontainer .DFAAnzeige.true {
-  background-color: #28a745; /* Grün für "Ja" */
+  background-color: #28a745;
   color: black;
 }
 
 .Kontrollcontainer .DFAAnzeige.false {
-  background-color: #dc3545; /* Rot für "Nein" */
+  background-color: #dc3545;
   color: black;
 }
 
 .Kontrollcontainer .IfMinimizedDFA.false{
-  background-color: #dc3545; /* Rot für "Nein" */
+  background-color: #dc3545;
   color: black;
 }
 
 .Kontrollcontainer .IfMinimizedDFA.true {
-  background-color: #28a745; /* Grün für "Ja" */
+  background-color: #28a745;
   color: black;
 }
 
+.howToContainer {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  max-width: 600px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  display: none;
+}
+
+.howToContainer.active {
+  display: block;
+}
 
 .DFAContainer {
   display: flex;
@@ -329,6 +346,7 @@ Anzeige der bisherigen Partitionen scrollbar
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 
 .SidebarDescription{
