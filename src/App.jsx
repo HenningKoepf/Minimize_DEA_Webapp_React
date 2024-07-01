@@ -774,8 +774,6 @@ function App() {
      */
     function refinePartitions(partitions, edges) {
         let currentPartitions = partitions;
-
-
         alphabet.forEach(symbol => {
             let newPartitions = [];
 
@@ -807,7 +805,6 @@ function App() {
                     }
                 });
             });
-
             // Aktualisiere die aktuellen Partitionen für das nächste Symbol
             currentPartitions = newPartitions;
         });
@@ -818,27 +815,35 @@ function App() {
 
 
 
-    /** Prüft ob zwei Partitionen identisch sind
+    /** Prüft ob zwei Partitionen identisch sind, leere Klassen werden ignoriert
      *
      * @param partitions1
      * @param partitions2
      * @returns {boolean}
      */
     function comparePartitions(partitions1, partitions2) {
-        if (partitions1.length !== partitions2.length) {
+        // Filtere leere Partitionen heraus damit die Längenüberprüfung funktioniert
+        const filteredPartitions1 = partitions1.filter(partition => partition.length > 0);
+        const filteredPartitions2 = partitions2.filter(partition => partition.length > 0);
+
+        if (filteredPartitions1.length !== filteredPartitions2.length) {
             return false;
         }
 
-        const sortedPartitions1 = partitions1.map(partition =>
-            partition.map(node => node.id).sort()
-        ).sort((a, b) => a[0].localeCompare(b[0]));
+        // Konvertiere jede Partition in ein Set, damit die Reihenfolge egal sit
+        const partitionSets1 = filteredPartitions1.map(partition => new Set(partition.map(node => node.id)));
+        const partitionSets2 = filteredPartitions2.map(partition => new Set(partition.map(node => node.id)));
 
-        const sortedPartitions2 = partitions2.map(partition =>
-            partition.map(node => node.id).sort()
-        ).sort((a, b) => a[0].localeCompare(b[0]));
-
-        for (let i = 0; i < sortedPartitions1.length; i++) {
-            if (sortedPartitions1[i].join() !== sortedPartitions2[i].join()) {
+        // Vergleiche jedes Set mit jedem Set
+        for (const set1 of partitionSets1) {
+            let foundMatch = false;
+            for (const set2 of partitionSets2) {
+                if (set1.size === set2.size && [...set1].every(id => set2.has(id))) {
+                    foundMatch = true;
+                    break;
+                }
+            }
+            if (!foundMatch) {
                 return false;
             }
         }
@@ -846,14 +851,11 @@ function App() {
         return true;
     }
 
-
     const checkIfMinimizedDFA = () => {
-        let minimizedCheckPartitions = partitions; // Start mit den initialen Partitionen
-            minimizedCheckPartitions = refinePartitions(partitions, edges);
-
-
-        setIsDFAMinimized( comparePartitions(partitions, minimizedCheckPartitions));
+        let minimizedCheckPartitions = refinePartitions(partitions, edges);
+        setIsDFAMinimized(comparePartitions(partitions, minimizedCheckPartitions));
     };
+
 
 
     /**
@@ -1143,9 +1145,9 @@ function App() {
                       </ul>
                       <h3>Tipps:</h3>
                       <ul>
-                          <li>Mit dem Schlosssymbl den Automaten vor unabsichtlicher Veränderung schützen.</li>
-                          <li>Beispiele als Ausgangsautomaten verwenden und speichern.</li>
-                          <li>Minimierung zuerst selbst und erst später automatisch durchführen.</li>
+                          <li>Mit dem Schlosssymbl einen konfigurierten Automaten vor unabsichtlicher Veränderung schützen.</li>
+                          <li>Beispiele als Ausgangsautomaten verwenden und zwischenspeichern.</li>
+                          <li>Minimierung zuerst selbst und erst im Anschluss automatisch durchführen.</li>
 
                       </ul>
                   </div>
@@ -1209,7 +1211,7 @@ function App() {
 
                       {
                           isDFAMinimized === true && (<button onClick={() => toggleMiniKonfigVisibility()}>
-                              {miniKonfigVisibility ? 'Details ausblenden' : 'Details des Automaten einblenden'}
+                              {miniKonfigVisibility ? 'Details ausblenden' : 'Minimalkonfiguration einblenden'}
                           </button>)
                       }
                   {
