@@ -5,7 +5,7 @@ export const exampleNodes: Node[] = [
         id: 'Z0',
         data: { label: 'Z0', input: true },
         position: { x: 50, y: 120 },
-        style: {backgroundColor: '#5a4eab'},
+        style: {backgroundColor: '#007bff'},
         targetPosition: 'left',
         sourcePosition: 'right',
     },
@@ -35,8 +35,8 @@ export const exampleNodes: Node[] = [
         data: { label: 'Z4', output: true },
         position: { x: 350, y: 70 },
         style: {
-            backgroundColor: '#12e81d',
-            border: "2px solid black" ,
+
+            border: "3px solid black" ,
             borderStyle: "double",},
         targetPosition: 'left',
         sourcePosition: 'right',
@@ -46,8 +46,8 @@ export const exampleNodes: Node[] = [
         data: { label: 'Z5' , output: true},
         position: { x: 350, y: 170 },
         style: {
-            backgroundColor: '#12e81d',
-            border: "2px solid black" ,
+
+            border: "3px solid black" ,
             borderStyle: "double",},
         targetPosition: 'left',
         sourcePosition: 'right',

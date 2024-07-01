@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback} from 'react';
 import { useReactFlow } from 'reactflow';
 
 
@@ -8,12 +8,25 @@ export default function EdgeContextMenu({
                                             left,
                                             right,
                                             bottom,
+                                            partitionDFAWithEdge,
+                                            partitions,
+                                            edges,
+                                            setPartitions,
+                                            highlightHoverSymbol,
+                                            setHighlightHoverSymbol,
+                                            highlightedPartition,
+                                            setHighlightedPartition,
+                                            isDfaResult,
+                                            isDFAMinimized,
+
                                             ...props
                                         }) {
-    const { getEdge, setEdge, addEdges, setEdges } = useReactFlow();
+    const { getEdge, setEdges } = useReactFlow();
 
 
 
+    const edge = getEdge(id);
+    const symbols = edge.label.split(/[,;\s]+/);
 
     const deleteEdge = useCallback(() => {
         setEdges((edges) => edges.filter((edge) => edge.id !== id));
@@ -23,7 +36,7 @@ export default function EdgeContextMenu({
         /*
         TODO: Inputform statt window.prompt
         */
-        const newLabel = window.prompt("Geben Sie den neuen Namen für die Kante ein:", "");
+        const newLabel = window.prompt("Geben Sie neue Übergangssymbole ein:", "");
 
         if (newLabel !== null) {
             setEdges((edges) =>
@@ -40,6 +53,25 @@ export default function EdgeContextMenu({
         }
     }, [id,setEdges]);
 
+    const initiatePartitioning = useCallback((selectedSymbol) => {
+        const selectedEdge = getEdge(id);
+        if (selectedEdge) {
+            partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol);
+        }
+    }, [id, getEdge, partitionDFAWithEdge, partitions, edges]);
+
+    const handleMouseEnter = useCallback((symbol) => {
+
+        setHighlightedPartition(prev => edge.source); // Setze die Partition basierend auf der Quelle der Kante
+        setHighlightHoverSymbol(prev => symbol);  // Setze das hervorzuhebende Symbol
+    }, [ edge, setHighlightedPartition, setHighlightHoverSymbol]);
+
+    const handleMouseLeave = useCallback(() => {
+        setHighlightedPartition(prev => null);
+
+        setHighlightHoverSymbol( prev => null);
+    }, [setHighlightedPartition, setHighlightHoverSymbol]);
+
 
 
 
@@ -50,12 +82,26 @@ export default function EdgeContextMenu({
             {...props}
         >
             <p style={{ margin: '0.5em' }}>
-                <small>Edge: {id}</small>
+                <small>Kante: {id}</small>
             </p>
-            <button onClick ={deleteEdge}>später verknüpfen</button>
 
-            <button onClick ={deleteEdge}>Kante Löschen</button>
-            <button onClick ={renameEdge}>Umbenennen</button>
+            {isDfaResult && !isDFAMinimized &&(
+                <div>
+                    {symbols.map((symbol, index) => (
+                        <button
+                            key={index}
+                            onClick={() => initiatePartitioning(symbol)}
+                            onMouseEnter={() => handleMouseEnter(symbol)}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            Prüfe auf Symbol: {symbol}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            <button onClick ={renameEdge}>Übergang ändern</button>
+            <button onClick ={deleteEdge}>Übergang Löschen</button>
 
 
         </div>

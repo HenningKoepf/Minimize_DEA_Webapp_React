@@ -16,7 +16,7 @@ export const initialNodes: Node[] = [
     },
     {
         id: 'Z1',
-        style: {backgroundColor: '#5a4eab'},
+        style: {backgroundColor: '#007bff'},
         data: { label: 'Z1' , input: true},
         position: { x: 100, y: 50 },
         sourcePosition: 'right',
@@ -46,8 +46,8 @@ export const initialNodes: Node[] = [
     {
         id: 'Endzustand',
         style: {
-            backgroundColor: '#12e81d',
-            border: "2px solid black" ,
+
+            border: "3px solid black" ,
             borderStyle: "double",},
         data: {label: 'Z5', output: true },
         position: { x: 500, y: 150 },

@@ -1,24 +1,22 @@
 .App {
   display: flex;
-  flex-direction: row; /* Anordnung der Inhalte in Spalten */
-  align-items: flex-start; /* Horizontale Ausrichtung */
-  justify-content: start;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .reactFlowsContainer {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* Stellt sicher, dass die Kinder in der Breite angepasst werden */
-  width: calc(100vw - 20px); /* Passt die Breite an, abzüglich des Margins */
+  align-items: stretch;
+  width: calc(100vw - 20px);
 }
-
 
 
 .alphabet {
   display: block;
 font-weight: bold;
 }
-
 .context-menu {
   background: white;
   border-style: solid;
@@ -26,6 +24,7 @@ font-weight: bold;
   position: absolute;
   z-index: 10;
 }
+
 
 .context-menu button {
   border: none;
@@ -38,6 +37,7 @@ font-weight: bold;
 .context-menu button:hover {
   background: white;
 }
+
 .react-flow__basenode {
   display: flex;
   align-items: center;
@@ -53,89 +53,13 @@ font-weight: bold;
   font-size: 8px;
   background: #eee;
   border: 1px solid #555;
-  /*
-
-  border-radius: 5px;
-   */
   border-radius: 50%;
   text-align: center;
   justify-content: center;
-  /*
-  line-height: 25px;
-   */
 }
-/*
-Dicker Rand für Endzustand
- */
-/* Regel für Nodes mit zwei Rahmenlinien */
-.react-flow__node[className = outputNode] {
-  background: lightgreen; /* Hintergrundfarbe anpassen */
-  font-weight: bold; /* Schriftart anpassen */
-  position: relative; /* Position relativ setzen */
-  border-radius: 50%;
-}
-
-
-
-/* Erste Rahmenlinie */
-.react-flow__node[data-output= true]::before {
-  content: '';
-  position: absolute;
-  top: -2px; /* Abstand von oben */
-  left: -2px; /* Abstand von links */
-  right: -2px; /* Abstand von rechts */
-  bottom: -2px; /* Abstand von unten */
-  border: 1px solid black; /* Erste Rahmenlinie */
-  border-radius: 50%;
-}
-/* Zweite Rahmenlinie */
-.react-flow__node[data-output= true]::after {
-  content: '';
-  position: absolute;
-  top: -5px; /* Abstand von oben */
-  left: -5px; /* Abstand von links */
-  right: -5px; /* Abstand von rechts */
-  bottom: -5px; /* Abstand von unten */
-  border: 1px solid black; /* Zweite Rahmenlinie */
-  border-radius: 50%;
-  z-index: -1; /* Hinter die erste Rahmenlinie legen */
-}
-
-.react-flow__node[data-input= true] {
-  border: 2px solid black;
-  background: lightgreen;
-}
-
-/* Regel für den Pfeil am Knoten mit ID "input" */
-
-.react-flow__node[data-input= true]::before {
-  content: ''; /* Leerer Inhalt */
-  position: absolute; /* Absolute Positionierung relativ zum Elternelement */
-  top: 50%; /* Vertikale Ausrichtung auf 50% des Knotens */
-  left: -10px; /* Horizontaler Abstand zum Knoten */
-  border: solid transparent; /* Transparenter Rand */
-  border-radius: 50%;
-  width: 0;
-  height: 0;
-  transform: translateY(-50%); /* Vertikale Ausrichtung zentrieren */
-}
-.react-flow__node[data-input= true]::after {
-  content: ''; /* Leerer Inhalt */
-  position: absolute; /* Absolute Positionierung relativ zum Elternelement */
-  top: 50%; /* Vertikale Ausrichtung auf 50% des Knotens */
-  left: -10px; /* Horizontaler Abstand zum Knoten */
-  border-radius: 50%;
-  border: 5px solid transparent;
-  border-left-color: #555;
-  width: 0;
-  height: 0;
-  transform: translateY(-50%);
-}
-
-
 
 .react-flow{
-  height: 50%  !important;
+  height: 60%  !important;
   width: 100%;
   border: 1px solid lightgray;
   border-radius: 5px;
@@ -151,23 +75,22 @@ Dicker Rand für Endzustand
   display: none;
 }
 
-
 .toptext {
   font-size: 32px;
   font-family: "Apple Braille", serif;
   text-align: center;
 }
 
+
 .Kontrollcontainer{
   border: 1px solid lightgray;
-  height: 100vh;
   width: 30vh;
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 10px;
-  flex-direction: column; /* Anordnung der Inhalte in Spalten */
-  align-items: flex-start; /* Horizontale Ausrichtung */
-  justify-content: flex-start; /* Vertikale Ausrichtung */
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 .Kontrollcontainer label {
   font-weight: bold;
@@ -175,18 +98,29 @@ Dicker Rand für Endzustand
 }
 
 .Kontrollcontainer input {
-  width: 100%;
-  padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  font-weight: bold;
+}
+.Kontrollcontainer .aktuelleKonfiguration {
+  font-weight: bold;
+  margin-top: 10px;
+
+}
+.howToButton {
+  width: 80%;
+}
+.howToButton:hover, .howToButton:focus {
+  background-color: #3e8e41;
 }
 
 .Kontrollcontainer .alphabet {
-  font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
-  margin-top: 5px;
+  font-family: monospace;
+  margin-top: 10px;
+
 }
 .Kontrollcontainer .zustände {
-  font-family: monospace; /* Für eine bessere Darstellung von Mengenklammern */
+  font-family: monospace;
   margin-top: 5px;
   font-weight: bold;
 }
@@ -198,8 +132,19 @@ Dicker Rand für Endzustand
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px; /* Abstand zum vorherigen Element */
+  margin-top: 10px; /* leichet Abstand zum vorherigen Element */
 }
+
+.partitiondiv button {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
 
 .Kontrollcontainer .DFAAnzeige {
   margin-top: 10px;
@@ -210,30 +155,76 @@ Dicker Rand für Endzustand
   margin-left: 5px;
   border: none;
 }
+.Kontrollcontainer .IfMinimizedDFA {
+  margin-top: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 5px;
+  border: none;
+}
 
 .Kontrollcontainer .DFAAnzeige.true {
-  background-color: #28a745; /* Grün für "Ja" */
+  background-color: #28a745;
   color: black;
 }
 
 .Kontrollcontainer .DFAAnzeige.false {
-  background-color: #dc3545; /* Rot für "Nein" */
+  background-color: #dc3545;
   color: black;
 }
 
+.Kontrollcontainer .IfMinimizedDFA.false{
+  background-color: #dc3545;
+  color: black;
+}
+
+.Kontrollcontainer .IfMinimizedDFA.true {
+  background-color: #28a745;
+  color: black;
+}
+
+.howToContainer {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  max-width: 600px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  display: none;
+}
+
+.howToContainer.active {
+  display: block;
+}
 
 .DFAContainer {
   display: flex;
-  align-items: center; /* Zentriert die Inhalte vertikal */
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+/*
+Stile der Anzeige im true und false Fall
+ */
 
-/* Stil für True */
 .DFAAnzeige.true {
-  color: green;
+  color: #28a745;
 }
 
-/* Stil für False */
+.IfMinimizedDFA.false {
+  color: red;
+}
+.IfMinimizedDFA.true {
+  color: #28a745;
+}
+
 .DFAAnzeige.false {
   color: red;
 }
@@ -241,18 +232,19 @@ Dicker Rand für Endzustand
 /*
 Anzeige der bisherigen Partitionen scrollbar
  */
+
 .partition-history {
   list-style-type: n´;
   margin-top: 0;
   padding-top: 10px;
   overflow-y: scroll;
-  max-height: 140px;
-  width: 95%;
+  max-height: 340px;
+
   margin-left: 5px;
 }
 
 .history-entry + .history-entry {
-  margin-top: 5px; /* Reduzieren Sie den Abstand zwischen den Einträgen */
+  margin-top: 5px; /* Reduziertden Abstand zwischen den Einträgen */
 }
 
 /* NodeLabelList *//* NodeLabelList.css */
@@ -295,16 +287,14 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .header {
-  font-size: 18px; /* Kleinere Schriftgröße */
-  color: #333;
-  margin-bottom: 5px; /* Reduzierter Abstand */
+  font-size: 18px;
+  margin-bottom: 5px;
 }
 
 .subHeader {
-  font-size: 14px; /* Kleinere Schriftgröße */
-  color: #666;
+  font-size: 14px;
   margin-top: 5px;
-  margin-bottom: 2px; /* Reduzierter Abstand */
+  margin-bottom: 2px;
 }
 
 .partition-history {
@@ -316,6 +306,10 @@ Anzeige der bisherigen Partitionen scrollbar
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  flex-direction: row;
+}
+.history-entry.hover .step-number {
+  font-weight: bold;
 }
 
 .partition-row {
@@ -323,8 +317,8 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .partition {
-  padding: 0 10px; /* Anpassen für Abstand zwischen Partitionen */
-  border-right: 1px solid black; /* Linie zwischen Partitionen */
+  padding: 0 10px;
+  border-right: 1px solid black;
 }
 
 .partition:last-child {
@@ -332,10 +326,167 @@ Anzeige der bisherigen Partitionen scrollbar
 }
 
 .symbol {
-  padding-left: 10px; /* Abstand zwischen Partitionen und Symbol */
-  white-space: nowrap; /* Verhindert Zeilenumbruch bei Symbolen */
+  padding-left: 10px;
+  white-space: nowrap;
 }
 
 .step-number {
-  padding-right: 10px; /* Abstand vor der Schritt-Nummer */
+  padding-right: 10px;
 }
+
+
+.examplebuttons{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.SidebarDescription{
+  font-weight: bold;
+}
+
+
+
+.partition-history .partitionHistoryColumn {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+
+.implyTrashStates{
+  display: flex;
+  width: fit-content;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.implyTrashStates .checkbox{
+  display: flex;
+  align-items: center;
+
+}
+
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  padding-right: 10px;
+
+}
+
+.dropbtn {
+  background-color: lightgreen;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #3e8e41;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  z-index: 1;
+  border-style: solid;
+}
+
+.dropdown-content button {
+  color: black;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.5em;
+}
+
+.dropdown-content button:hover {
+  background: white;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}
+
+
+.dndflow {
+  flex-direction: column;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  font-size: 14px;
+
+}
+
+.dndflow aside {
+  border-right: 1px solid #eee;
+  padding: 15px 10px;
+  font-size: 12px;
+  background: #fcfcfc;
+}
+
+.dndflow aside .description {
+  margin-bottom: 10px;
+}
+
+.dndflow .dndnode {
+  height: 20px;
+  width: 80px;
+  padding: 4px;
+  border: 1px solid green;
+  border-radius: 2px;
+
+  margin: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+}
+
+.dndflow .dndnode .input{
+  border-color: blue;
+}
+
+.dndflow .dndnode .output {
+  border-color: #ff0072;
+}
+
+
+.dndflow .reactflow-wrapper {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.dndflow .selectall {
+  margin-top: 10px;
+}
+
+/*Für die Anzeige bei Endgeräte mit kleiner Auflösung*/
+
+@media screen and (min-width: 768px) {
+  .dndflow {
+    flex-direction: row;
+  }
+
+  .dndflow aside {
+    width: 20%;
+    max-width: 250px;
+  }
+}
+
+

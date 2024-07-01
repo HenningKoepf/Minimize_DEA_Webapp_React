@@ -24,7 +24,7 @@ const NodeLabelList = ({ nodes, edges }) => {
 
     return (
         <div>
-            <h3 className="header">Zustände und Übergänge:</h3>
+            <h3 className="header">Übergangsfunktionen:</h3>
             <ul className="nodeList">
                 {nodes.map((node, index) => (
                     <li key={index} className="nodeItem">
