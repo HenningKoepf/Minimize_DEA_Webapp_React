@@ -58,19 +58,18 @@ export default function NodeContextMenu({
   const deleteNode = useCallback(() => {
     setNodes((nodes) => {
 
-      const outputNodesCount = nodes.filter(node => node.data.output).length;
+
       const inputNodesCount = nodes.filter(node => node.data.input).length;
 
       const nodeToDelete = nodes.find(node => node.id === id);
 
       // Überprüfe, ob der zu löschende Knoten ein Output- oder Input-Knoten ist
-      const isOutputNode = nodeToDelete?.data.output;
       const isInputNode = nodeToDelete?.data.input;
 
       // Verhindere das Löschen, wenn es der letzte Output- oder Input-Knoten ist
-      if ((isOutputNode && outputNodesCount === 1) || (isInputNode && inputNodesCount === 1)) {
-        console.error("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
-        alert("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
+      if  (isInputNode && inputNodesCount === 1) {
+        console.error("Der einzige Input-Knoten kann nicht gelöscht werden.");
+        alert("Der einzige Startzustand sollte nicht gelöscht werden.");
         return nodes;
 
       }
@@ -156,20 +155,17 @@ export default function NodeContextMenu({
 
   const defaultNode = useCallback(() => {
     setNodes((nodes) => {
-
-      const outputNodesCount = nodes.filter(node => node.data.output).length;
       const inputNodesCount = nodes.filter(node => node.data.input).length;
 
 
       return nodes.map((node) => {
         if (node.id === id) {
-          // Überprüfe, ob es sich um den letzten Output- oder Input-Knoten handelt
-          const isLastOutputNode = node.data.output && outputNodesCount === 1;
+          // Überprüfe, ob es sich um den letzten Input-Knoten handelt
           const isLastInputNode = node.data.input && inputNodesCount === 1;
 
           // Verhindere die Änderung, wenn es der letzte Knoten seiner Art ist
-          if (isLastOutputNode || isLastInputNode) {
-            alert("Die Standardisierung des letzten Output- oder Input-Knotens ist nicht erlaubt.");
+          if ( isLastInputNode) {
+            alert("Die Standardisierung des Input-Knoten ist nicht vorgesehen.");
             return node;
           }
 
@@ -253,5 +249,3 @@ export default function NodeContextMenu({
     </div>
   );
 }
-//<button onClick = {changeToInputNode}>Startzustand umschalten</button>
-//<button onClick={duplicateNode}>Neuer Zustand </button>
