@@ -473,12 +473,7 @@ function App() {
         const startStateId = startStates[0].id;
         const transitions = new Map();
 
-        const endStates = nodes.filter(node => node.data.output === true);
-        if (endStates.length === 0) {
-            console.error("Es muss mindestens einen Endzustand geben.");
-            alert("Es muss mindestens einen Endzustand geben.")
-            return false;
-        }
+
 
         // Initialisieren der Transitions Map mit leeren Sets
         nodes.forEach(node => {
@@ -747,7 +742,7 @@ function App() {
      * @param historyEntry
      * @returns {JSX.Element}
      */
-    const renderPartitionWithSymbol = (historyEntry) => {
+    const renderPartitionWithSymbol = (historyEntry, index) => {
         if (!historyEntry || !historyEntry.partitions) {
             return <div>Partitionsgeschichte ist nicht verfügbar.</div>;
         }
@@ -757,7 +752,7 @@ function App() {
                 {historyEntry.partitions.map((partition, partitionIndex) => (
                     <span key={partitionIndex}>
             {'{' + partition.map(node => node.id).join(", ") + '}'}
-                        {partitionIndex < historyEntry.partitions.length - 1 ? " | " : ""}
+                        {partitionIndex < historyEntry.partitions.length - 1 ? "  |  " : ""}
         </span>
                 ))}
 
@@ -830,7 +825,7 @@ function App() {
             return false;
         }
 
-        // Konvertiere jede Partition in ein Set, damit die Reihenfolge egal sit
+        // Konvertiere beeid Partitionem in ein Set, damit die Reihenfolge egal ist
         const partitionSets1 = filteredPartitions1.map(partition => new Set(partition.map(node => node.id)));
         const partitionSets2 = filteredPartitions2.map(partition => new Set(partition.map(node => node.id)));
 
@@ -1357,7 +1352,7 @@ function App() {
                                     </div>
                                 )}
                                 <div style={{ height: '10px' }}></div>
-                                {renderPartitionWithSymbol(historyEntry)}
+                                {renderPartitionWithSymbol(historyEntry, index)}
 
                             </div>
                         ))}

@@ -68,8 +68,8 @@ export default function NodeContextMenu({
       const isInputNode = nodeToDelete?.data.input;
 
       // Verhindere das Löschen, wenn es der letzte Output- oder Input-Knoten ist
-      if ((isOutputNode && outputNodesCount === 1) || (isInputNode && inputNodesCount === 1)) {
-        console.error("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
+      if  (isInputNode && inputNodesCount === 1) {
+        console.error("Der einzige Input-Knoten kann nicht gelöscht werden.");
         alert("Der letzte Output- oder Input-Knoten kann nicht gelöscht werden.");
         return nodes;
 
