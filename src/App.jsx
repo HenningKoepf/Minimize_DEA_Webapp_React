@@ -225,7 +225,7 @@ function App() {
                 const left = Math.min(clickX- kontrollContainerWidth , pane.width - kontrollContainerWidth - 200);
                 // limit die linke Position mit Breite des Kontrollcontainer
                 const top = Math.min(clickY -topTextHeight, pane.height -topTextHeight - 200);
-                //hover enhanced
+                //hover enhanced eingebaut über highlighted
                 setEdgeMenu({
                     className:"context-menu",
                 id: edge.id,
