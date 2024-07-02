@@ -50,7 +50,7 @@ function App() {
     const [edgemenu, setEdgeMenu] = useState(null);
     const [menu, setMenu] = useState(null);
 
-    const [isDfaResult, setIsDfaResult, onChange] = useState(null);
+    const [isDfaResult, setIsDfaResult] = useState(null);
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -248,7 +248,7 @@ function App() {
 
 
         },
-        [setEdgeMenu, edges, nodes, partitions, highlightHoverSymbol , highlightedPartition,isDfaResult],
+        [setEdgeMenu, edges, partitions, highlightHoverSymbol , highlightedPartition,isDfaResult, isDFAMinimized, partitionDFAWithEdge],
     );
 
     /**
@@ -300,8 +300,7 @@ function App() {
     /**
      * Drag an drop neuer Knoten
      */
-    let id = 0;
-    const getId = () => `CopyZustand_${id++}`;
+
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
 
@@ -475,7 +474,7 @@ function App() {
 
 
 
-        // Initialisieren der Transitions Map mit leeren Sets
+        // Initialisieren der ÜbergangsMap mit leeren Sets
         nodes.forEach(node => {
             alphabet.forEach(symbol => {
                 const key = `${node.id}-${symbol}`;
@@ -483,7 +482,7 @@ function App() {
             });
         });
 
-        // Verarbeiten der Kanten
+        // Verarbeiten der einzelnen Übergängen
         for (const edge of edges) {
             const symbols = edge.label.split(/[,;\s]\s*/).map(symbol => symbol.trim());
             for (const symbol of symbols) {
@@ -499,7 +498,7 @@ function App() {
                     alert(`Mehr als ein Übergang für das Symbol '${symbol}' beim Zustand '${edge.source}' definiert.`);
                     return false;
                 }
-                transitions.set(key, edge.target); // Setzt den Zielzustand für den Übergang
+                transitions.set(key, edge.target); // Setzt den Zielzustand für den Übergang fix
             };
         }
 
@@ -520,7 +519,7 @@ function App() {
             return false;
         }
 
-        // Überprüfung der Erreichbarkeit aller Zustände naja... still to debug..got it :D
+        // Überprüfung der Erreichbarkeit aller Zustände naja
         let visited = new Set();
         let queue = [startStateId];
         while (queue.length > 0) {
@@ -547,69 +546,12 @@ function App() {
 
 
     /**
-     * Erstmal die partitionierung mit einem einzigen Symbol
+     * Erstmal die partitionierung mit einem einzigen Symbol in einer einzigen Äquivalenzklasse
      * @param partitions
      * @param edges
      * @param selectedEdge
      * @returns {{partitions: *[], changed: boolean}}
      */
-/*
-
-
-    function partitionDFAWithEdge(partitions, edges, selectedEdge,selectedSymbol) {
-
-        let newPartitions = [];
-        let changed = false;
-        // Finde das Übergangssymbol der ausgewählten Kante
-        //const selectedSymbol = selectedEdge.label;
-
-        partitions.forEach(partition => {
-            let targetPartitionMap = new Map();
-
-            partition.forEach(node => {
-                // Prüfe, ob der aktuelle Knoten der Quellknoten der ausgewählten Kante ist
-                    const target = findTargetState(node, selectedSymbol, edges);
-
-                    if (target !== null) { // behandle keine Müllzustände
-                        const targetPartition = findPartitionForState(target, partitions);
-                        if (targetPartition) {
-                            let nodes = targetPartitionMap.get(targetPartition) || [];
-                            nodes.push(node);
-                            targetPartitionMap.set(targetPartition, nodes);
-                        }
-                    } else {
-                        // Behandle Knoten ohne gültigen Übergang für das Symbol als müll separat
-                        let nodes = targetPartitionMap.get(null) || [];
-                        nodes.push(node);
-                        targetPartitionMap.set(null, nodes);
-                    }
-
-            });
-
-            // Erstelle neue Partitionen basierend auf der Gruppierung
-            targetPartitionMap.forEach((nodes, _) => {
-                if (nodes.length < partition.length) {
-                    changed = true; // Die Partition wurde geändert
-                }
-                newPartitions.push(nodes);
-
-
-            });
-        });
-
-        // Gib die neuen Partitionen und das Änderungsflag zurück appende die History
-        setPartitionsHistory(prevHistory => {
-            //hatten wir das Symbol schon?
-            const symbolExists = prevHistory.some(entry => entry.symbol === selectedSymbol);
-            if (!symbolExists) {
-                return [...prevHistory, { symbol: selectedSymbol, partitions: newPartitions }];
-            }
-            return prevHistory; // Keine Änderung, wenn Symbol bereits vorhanden
-        });
-         setPartitions(newPartitions);
-
-    }
-*/
 
     function partitionDFAWithEdge(partitions, edges, selectedEdge, selectedSymbol) {
         let newPartitions = [];
@@ -648,7 +590,7 @@ function App() {
             }
         });
 
-        // Erstelle neue Partitionen basierend auf der Gruppierung setze änderungsflag
+        // Erstellt neue Partitionen basierend auf der Gruppierung und setze änderungsflag
         targetPartitionMap.forEach((nodes, targetPartition) => {
             if (nodes.length < sourcePartition.length) {
                 changed = true;
@@ -764,7 +706,7 @@ function App() {
 
 
     /** Hilfsfunktion zum Prüfen ob der Automat schon minimal is, erzeugt das ergebnis von automaticher berechnung für
-     * Vergleich mit aktuell erzeugtem Automaten
+     * Vergleich mit aktuell erzeugtem Automaten. Gibt die Partition eines minimalen Automaten zurück.
      *
      */
     function refinePartitions(partitions, edges) {
@@ -810,13 +752,15 @@ function App() {
 
 
 
-    /** Prüft ob zwei Partitionen identisch sind, leere Klassen werden ignoriert
+    /** Prüft ob zwei Partitionen identisch sind, leere Klassen werden dabei ignoriert
      *
      * @param partitions1
      * @param partitions2
      * @returns {boolean}
      */
+
     function comparePartitions(partitions1, partitions2) {
+
         // Filtere leere Partitionen heraus damit die Längenüberprüfung funktioniert
         const filteredPartitions1 = partitions1.filter(partition => partition.length > 0);
         const filteredPartitions2 = partitions2.filter(partition => partition.length > 0);
@@ -868,7 +812,7 @@ function App() {
     const createMinimizedDFA = () => {
         const newNodes = [];
         const newEdges = [];
-        const partitionMap = {}; // Mapt die alten Knoten-IDs auf neue Knoten-IDs
+        const partitionMap = {}; // Mapt die alten Knoten-IDs auf neue erstellten Knoten-IDs
         const edgeLabelsMap = {}; // Mapts Labels für Kanten zwischen Partitionen
 
 
@@ -899,7 +843,7 @@ function App() {
 
             const newNode = {
 
-                id: `P${index}`, // Eindeutige ID für den erzeugten Knoten
+                id: `P${index}`, // Eindeutige ID für den neu erzeugten Knoten
                 data: { ...partition[0].data, label: "{" + partition.map(node => node.data.label).join(", ") +"}" },
                 position: calculateAveragePosition(partition, nodes),
                 targetPosition: 'left',
@@ -920,7 +864,7 @@ function App() {
             const sourcePartition = partitionMap[edge.source];
             const targetPartition = partitionMap[edge.target];
 
-            // Key für jede Kantenverbindung zwischen Partitionen
+            // Neuer Key für jede Kantenverbindung zwischen Partitionen
             const edgeKey = `${sourcePartition}->${targetPartition}`;
             // initialisieren
             if (!edgeLabelsMap[edgeKey]) {
@@ -965,7 +909,10 @@ function App() {
         setfinalEdges(newEdges);
     };
 
-
+    /**
+     * Drag and Drop von Zuständen verändert deren Position und die Position des Inputknotens
+     * @type {(function(*, *): void)|*}
+     */
     const onNodeDrag = useCallback(
         (event, node) => {
             if (node.data.input === true) { //Eingehender Pfeil schwebt von einem unsichtbaren Knoten aus
@@ -1082,7 +1029,7 @@ function App() {
 
 
     /**
-     *  Edges als enhance edges mit dem hover-based styling
+     *  Edges als enhance edges mit dem hover-based styling um dynamisch einzelne Übergänge im finalen Automaten hervorzuheben
      */
 
 
