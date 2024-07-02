@@ -11,15 +11,12 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import './styles/styles.css'
 
-
-
 import NodeContextMenu from './components/NodeContextMenu';
 import EdgeContextMenu from './components/EdgeContextMenu';
 import SelfConnectingEdge from './elements/SelfConnectingEdge';
 import CustomEdge from './elements/CustomEdge';
 import BaseNode from './elements/BaseNode';
 import Sidebar from './components/Sidebar';
-
 
 import {initialNodes, initialEdges} from './elements/initial-setup2';
 import {initialNodes3, initialEdges3} from './elements/initial-setup3';
@@ -32,11 +29,13 @@ import {findPartitionForState, findTargetState} from './components/Partitioner';
 import NodeLabelList from './components/NodeLabelList';
 
 
-//Zus#tzlich zum Default fall
+//Zus#tzlich zum Default fall eigene Übergangsvarianten
 const EdgeTypes = {
     selfconnecting: SelfConnectingEdge,
     custom: CustomEdge,
 };
+
+//Eigener Zustandstyp um die Bezeichner und data zu tragen
 
 const NodeTypes = {
     basenode: BaseNode,
@@ -47,19 +46,18 @@ function App() {
 
 
     //Zustands Management
+    //Kontextmenü für Übergänge und Zustände
     const [edgemenu, setEdgeMenu] = useState(null);
     const [menu, setMenu] = useState(null);
-
+    //Ist der Automat ein korrekter DFA
     const [isDfaResult, setIsDfaResult] = useState(null);
-
+    //welche Zustände und übergänge gibt es
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-
+    //Welche Symbole sind im Alphabet
     const [alphabet, setAlphabet] = useState([]);
-
+    //Sollen Müllzustände für fehlende Übergänge impliziert werden
     const [implyTrashStates, setImplyTrashStates] = useState(false);
-
     //umschalten ob Müllzustände impliziert werden
     const toggleImplyTrashStates = () => {
         setImplyTrashStates(!implyTrashStates);
@@ -81,6 +79,7 @@ function App() {
         setEdges(prev => miniEdges);
         setAlphabet(['a']);
     }
+    const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
     //beispiel 3
 
@@ -103,7 +102,7 @@ function App() {
         return [nonEndStates, endStates];
     };
 
-
+    //Zustandsmanagement für Zustandsklssen der Partition und des Protokolls
     const [partitions, setPartitions] = useState(initialPartition(nodes));
     const [partitionsHistory, setPartitionsHistory] = useState([]);
 
@@ -114,9 +113,10 @@ function App() {
     // States für die Anzeige der History mit Details
 
     const [detailsVisibility, setDetailsVisibility] = useState({}); // State für das Ein-/Ausblenden der Details
+    //State für Detailssciht des minimalautomaten
     const [miniKonfigVisibility, setMiniKonfigVisibility] = useState(false);
 
-    //States für Hovering
+    //States für Hovering-highlights der kanten
 
     const [highlightHoverSymbol, setHighlightHoverSymbol] = useState(null);
     const [highlightedPartition, setHighlightedPartition] = useState(null);
@@ -124,12 +124,12 @@ function App() {
     //States für MinimizedFinishedCheck
     const[isDFAMinimized, setIsDFAMinimized] = useState (false);
 
-    //infobox how to
+    //infobox how to der Anleitung
     const [showHowTo, setShowHowTo] = useState(false);
 
 
     /**
-     * das Alphabet soll automatisch aktualisiert werden, sobald neue symbole hinzukommen!
+     * das Alphabet wird automatisch aktualisiert werden, sobald neue symbole im Automat hinzukommen!
      * Der versteckte Knoten mit dem ungelabelten Inputknoten ist davon ausgenommen
      */
     useEffect(() => {
@@ -146,7 +146,7 @@ function App() {
     }, [edges]);
 
 
-    //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen  initialisiert.
+    //Wenn der Automat geändert wird, werden die Partitionen und Auswertungen initialisiert.
     useEffect(() => {
         const updatedPartitions = initialPartition(nodes.filter(node => node.style?.visibility !== 'hidden'));
         setPartitions(updatedPartitions);
@@ -159,7 +159,7 @@ function App() {
     }, [nodes, alphabet, edges, implyTrashStates]);
 
     /**
-     * Refs für die einzelnen Komponenten, damit kan nich dynamisch auf die Größenänderungen reagieren
+     * Refs für die einzelnen Komponenten, damit kann immer dynamisch auf die Größenänderungen reagiert werden
      * @type {{current: (unknown|null)}}
      */
     const ref = useRef(null);
@@ -168,7 +168,7 @@ function App() {
     const topTextRef = useRef(null);
 
     /**
-     * Beim Klick auf das Canvas sollen alle Menüs geschlossen werden
+     * Beim Klick auf das reactflow Canvas sollen alle Menüs geschlossen werden
      * @type {(function(): void)|*}
      */
     const onPaneClick = useCallback(() => {
@@ -202,11 +202,11 @@ function App() {
 
 
     /**
-     * Erzeugt das Kontextmenü für Kanten
+     * Erzeugt das Kontextmenü für Kanten mit Editiermöglichkeitn
      * @type {(function(*, *): void)|*}
      */
 
-    //Kante umbenennen und löschen
+
     const onEdgeContextMenu = useCallback((event,edge) => {
         // Kein normales Kontextmenü
         event.preventDefault();
@@ -225,7 +225,7 @@ function App() {
                 const left = Math.min(clickX- kontrollContainerWidth , pane.width - kontrollContainerWidth - 200);
                 // limit die linke Position mit Breite des Kontrollcontainer
                 const top = Math.min(clickY -topTextHeight, pane.height -topTextHeight - 200);
-                //hover enhanced eingebaut über highlighted
+
                 setEdgeMenu({
                     className:"context-menu",
                 id: edge.id,
@@ -238,6 +238,7 @@ function App() {
                 edges: edges,
                 partitionDFAWithEdge: partitionDFAWithEdge,
                 setPartitions: setPartitions,
+                    //hover enhanced eingebaut mit  highlighted kanten
                 setHighlightHoverSymbol: setHighlightHoverSymbol,
                 highlightHoverSymbol: highlightHoverSymbol,
                     setHighlightedPartition: setHighlightedPartition,
@@ -273,7 +274,7 @@ function App() {
                     setEdges((edges) => [...edges, newEdge]);
                 } else {
 
-                    // Prüfen, ob eine entgegenlaufende Kante existiert
+                    // Prüfen, ob eine überschneidende Kante existiert
                     const existingEdge = edges.find(
                         (edge) => edge.source === params.target && edge.target === params.source
                     );
@@ -297,17 +298,17 @@ function App() {
     );
 
 
-    /**
-     * Drag an drop neuer Knoten
-     */
-
-    const [reactFlowInstance, setReactFlowInstance] = useState(null);
-
-
     const onDragOver = useCallback((event) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     }, []);
+
+
+    /**
+     * Drag an drop neuer Knoten
+     */
+
+
 
     const onDrop = useCallback(
         (event) => {
@@ -504,14 +505,14 @@ function App() {
 
         // Überprüfung auf Vollständigkeit des DFA
         let isComplete = true;
-        transitions.forEach((targetState, key) => {
+        for (const [key, targetState] of transitions.entries()) {
             if (isComplete && targetState === null && !implyTrashStates) {
                 // Wenn implyTrashStates false ist und ein Übergang fehlt, ist der DFA nicht vollständig
                 alert("DFA ist nicht vollständig. Es fehlt der Übergang:" + key);
                 isComplete = false;
-
+                break;
             }
-        });
+        }
 
         if (!isComplete) {
             console.error("DFA ist nicht vollständig. Es fehlen Übergänge für mindestens ein Symbol in mindestens einem Zustand.");
@@ -519,12 +520,14 @@ function App() {
             return false;
         }
 
-        // Überprüfung der Erreichbarkeit aller Zustände naja
+        // Überprüfung der Erreichbarkeit aller Zustände
         let visited = new Set();
         let queue = [startStateId];
         while (queue.length > 0) {
+            //eins weiter
             const currentState = queue.shift();
             if (!visited.has(currentState)) {
+                //dann rein
                 visited.add(currentState);
                 alphabet.forEach(symbol => {
                     const key = `${currentState}-${symbol}`;
@@ -634,6 +637,7 @@ function App() {
 
     /**
      * Speichern der Konfiguration im Browser des Clients
+     * nodes und edges mit alphabet für direktes update
      */
 
     const saveConfiguration = () => {
@@ -680,7 +684,7 @@ function App() {
     }
 
     /**
-     * Anzeige Rendering der neuen Partitionen mit Übergangssysmbol
+     * Anzeige Rendering der neuen Partitionen mit Übergangssysmbol und getrennt
      * @param historyEntry
      * @returns {JSX.Element}
      */
@@ -795,13 +799,12 @@ function App() {
         setIsDFAMinimized(comparePartitions(partitions, minimizedCheckPartitions));
     };
 
-
-
     /**
-     * Kreation des erzeugten Automaten basierend auf der aktuellen Partition
+     * Kreation des erzeugten Automaten basierend auf der aktuellen Partition wenn es ein dfa ist
      * @param partitions
      * @returns {{newEdges: *[], newNodes: *[]}}
      */
+
     useEffect(() => {
         createMinimizedDFA();
         setIsDFAMinimized(null);
@@ -1056,7 +1059,7 @@ function App() {
 
     return (
       <>
-     <div className="toptext" ref={topTextRef} >D E A ---  M I N I M I E R E R ! </div>
+     <div className="toptext" ref={topTextRef} >D E A - M I N I M I E R U N G </div>
 
           <div className="App">
               <div className="Kontrollcontainer" ref={kontrollContainerRef}>
@@ -1069,27 +1072,27 @@ function App() {
                   <div className={`howToContainer ${showHowTo ? 'active' : ''}`}>
                       <h3>Konstruktion:</h3>
                       <ul>
-                          <li>Durch Ziehen zwischen den Zuständen neue Übergänge erzeugen.</li>
+                          <li>Ziehe einfach eine Linie zwischen zwei Zuständen, um einen neuen Übergang zu erstellen.</li>
                           <li>Übergänge verlassen Zustände nach rechts und enden links. </li>
-                          <li>Mt dem Button überprüfen ob der konstruierte Automat ein korrekter DEA ist.</li>
-                          <li>Unvollständige Automaten werden nur mit "Müllzustand implizieren" akzeptiert. </li>
-                          <li>Über Rechtsklicks können Zustände und Übergänge weiter verändert werden. </li>
+                          <li>Nutze einen Rechtsklick, um Zustände und Übergänge weiter zu verändern. </li>
+                          <li>Mit dem Button kannst du prüfen, ob der konstruierte Automat ein deterministischer endlicher Automat ist.</li>
+                          <li>Unvollständige Automaten werden nur mit der Option "Müllzustand implizieren" akzeptiert. </li>
                       </ul>
                       <h3>Minimierung:</h3>
                       <ul>
-                          <li>Es wird ein Automat mit zwei Zustandsklassen erzeugt. Je alle Zustände und alle Endzuständen sind verschmolzen.</li>
-                          <li>Ein Rechtsklick auf einen Übergang im oberen Automat öffnet ein Menü für den nächsten Schritt.</li>
-                          <li>Dort werden beim Hovern über die Symbole Übergänge im erzeugten Automat rot markiert. Ist dabei mehr als ein Übergang rot, gibt es einen Konflikt.
-                              Der erzeugte Automat ist nicht eindeutig. </li>
-                          <li>Dieser Konflikt wird durch eine Trennung der aktuellen Zustandsklassen gelöst.
-                              Im Protokoll daneben befinden sich jeweils Details und Begründung. </li>
-                          <li>Gibt es keine Konflikte mehr, ist der erzeugte Automat minimal. </li>
+                          <li>Es wird ein Automat mit zwei Zuständen erzeugt. In einem sind alle Endzustände vereint, im anderen die restlichen Zustände.</li>
+                          <li>Ein Rechtsklick auf einen Übergang im oberen Automaten öffnet ein Menü für den nächsten Schritt.</li>
+                          <li>Beim Hovern über ein Symbol im Menü werden relevante Übergänge im erzeugten Automaten rot markiert.
+                              Wenn mehr als ein Übergang rot ist, gibt es einen Konflikt.
+                              Der Konflikt zeigt, dass der erzeugte Automat nicht eindeutig ist.</li>
+                          <li>Ein Klick auf das Symbol löst den Konflikt, indem die aktuellen Zustandsklassen getrennt werden.</li>
+                          <li>Der erzeugte Automat ist minimal wenn es keine Konflikte mehr gibt. </li>
                       </ul>
-                      <h3>Tipps:</h3>
+                      <h4>Tipps:</h4>
                       <ul>
-                          <li>Mit dem Schlosssymbl einen konfigurierten Automaten vor unabsichtlicher Veränderung schützen.</li>
-                          <li>Beispiele als Ausgangsautomaten verwenden und zwischenspeichern.</li>
-                          <li>Minimierung zuerst selbst und erst im Anschluss automatisch durchführen.</li>
+                          <li>Mit dem Schlosssymbol kannst du den konfigurierten Automaten vor unabsichtlicher Veränderung schützen.</li>
+                          <li>Verwende vordefinierte Beispiele als Ausgangssituationen und speichere Automaten zwischen.</li>
+                          <li>Versuche zuerst selbst die Minimierung durchzuführen und nutze erst danach die automatische Funktion.</li>
 
                       </ul>
                   </div>
@@ -1169,8 +1172,6 @@ function App() {
 
                           </div>)
                   }
-
-
                 </div>
               </div>
               <div className="reactFlowsContainer" style={{ height: '140vh', width: '90%', marginBottom: '20px' }}>
@@ -1199,8 +1200,6 @@ function App() {
             nodes={nodes.filter(node => !node.id.includes('hidden'))}/>
 
             <Background variant="dots" gap={15} size={1} />
-
-
             {menu && <NodeContextMenu onClick={onPaneClick} {...menu} />}
             {edgemenu && <EdgeContextMenu onClick={onPaneClick} {...edgemenu} />}
         </ReactFlow>
@@ -1311,6 +1310,7 @@ function App() {
 
             </div>
           </div>
+
 
 
 

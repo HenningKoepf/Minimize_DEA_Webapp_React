@@ -1,5 +1,4 @@
-import Reactfrom from 'react';
-import ReactFlow from 'reactflow';
+
 
 /**
  * Standard Zustand als Grundelement nut mit Name und className
@@ -12,9 +11,9 @@ const BaseNode = ({ data }) => {
     const className = data.output ? "outputNode" : "basenode";
     return(
         <>
-        <div className = {className} >
-            {data.label}
-        </div>
+            <div className = {className} >
+                {data.label}
+            </div>
         </>
     );
 };

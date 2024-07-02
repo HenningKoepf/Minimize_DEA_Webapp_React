@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * Kleine Toolbar Komponente, die es erlaubt neue Zustände per drag and Drop auf den Reactflow wan
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Sidebar = () => {
     const onDragStart = (event, nodeType) => {
         event.dataTransfer.setData('application/reactflow', nodeType);

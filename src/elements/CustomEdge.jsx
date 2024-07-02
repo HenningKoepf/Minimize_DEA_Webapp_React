@@ -3,7 +3,8 @@ import { getBezierPath, EdgeLabelRenderer } from 'reactflow';
 
 /**
  *
- *Im Falle von konkurierenden übereinanderliegende Edge-Labels
+ *Im Falle von konkurierenden übereinanderliegende Edge-Labels benötigen wir leicht verschobene Labels der Übergänge
+ * Dafür kommen CustomEdges zum einsatz mit einem offset für die Symbole
  * @param id
  * @param sourceX
  * @param sourceY

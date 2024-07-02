@@ -63,10 +63,10 @@ export default function NodeContextMenu({
 
       const nodeToDelete = nodes.find(node => node.id === id);
 
-      // Überprüfe, ob der zu löschende Knoten ein Output- oder Input-Knoten ist
+      // Überprüfe, ob der zu löschende Knoten ein Input-Knoten ist
       const isInputNode = nodeToDelete?.data.input;
 
-      // Verhindere das Löschen, wenn es der letzte Output- oder Input-Knoten ist
+      // Verhindere das Löschen, wenn es der letzte Input-Knoten ist
       if  (isInputNode && inputNodesCount === 1) {
         console.error("Der einzige Input-Knoten kann nicht gelöscht werden.");
         alert("Der einzige Startzustand sollte nicht gelöscht werden.");
@@ -187,7 +187,7 @@ export default function NodeContextMenu({
    * @type {(function(): void)|*}
    */
   const renameNode = useCallback(() => {
-    const newLabel = window.prompt("Geben Sie den neuen Namen für den Knoten ein:", "");
+    const newLabel = window.prompt("Geben Sie den neuen Bezeichner für den Zustand ein:", "");
     if (newLabel && newLabel.trim() !== "") {
       // Map auf alle Knoten, einen neuen dann zurück
       setNodes((prevNodes) =>
@@ -210,7 +210,7 @@ export default function NodeContextMenu({
               return { ...node, id: `${newLabel}-hidden` };
             }
             return node;
-          }).flat() // danke für .flat
+          }).flat() // danke für .flat des gemappten arrays
       );
 
       //auch neue edges dafür schlauer schachteln geht irg wie nicht

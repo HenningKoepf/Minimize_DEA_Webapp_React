@@ -18,12 +18,9 @@ export default function EdgeContextMenu({
                                             setHighlightedPartition,
                                             isDfaResult,
                                             isDFAMinimized,
-
                                             ...props
                                         }) {
     const { getEdge, setEdges } = useReactFlow();
-
-
 
     const edge = getEdge(id);
     const symbols = edge.label.split(/[,;\s]+/);
@@ -33,9 +30,7 @@ export default function EdgeContextMenu({
     }, [id, setEdges]);
 
     const renameEdge = useCallback((edgeId) => {
-        /*
-        TODO: Inputform statt window.prompt
-        */
+        //prompt als Eingabeaufforderung
         const newLabel = window.prompt("Geben Sie neue Übergangssymbole ein:", "");
 
         if (newLabel !== null) {
@@ -62,13 +57,13 @@ export default function EdgeContextMenu({
 
     const handleMouseEnter = useCallback((symbol) => {
 
-        setHighlightedPartition(prev => edge.source); // Setze die Partition basierend auf der Quelle der Kante
-        setHighlightHoverSymbol(prev => symbol);  // Setze das hervorzuhebende Symbol
+        setHighlightedPartition(prev => edge.source); // Bestimme die Partition basierend auf der Quelle der Kante
+        setHighlightHoverSymbol(prev => symbol);  // Setze das hervorzuhebende Symbol fest
     }, [ edge, setHighlightedPartition, setHighlightHoverSymbol]);
 
+    //Anzeige modifikationen, alles wieder auf 0
     const handleMouseLeave = useCallback(() => {
         setHighlightedPartition(prev => null);
-
         setHighlightHoverSymbol( prev => null);
     }, [setHighlightedPartition, setHighlightHoverSymbol]);
 

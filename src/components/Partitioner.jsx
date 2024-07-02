@@ -1,6 +1,4 @@
-
 import React, { useEffect } from 'react';
-
 
 export const initialPartition = (nodes) => {
     const endStates = nodes.filter(node => node.data.output);
@@ -10,13 +8,14 @@ export const initialPartition = (nodes) => {
 
 /**
  * Splitted das Label der Kante auf um einzelne übergänge zu betrachten
+ * Diese Funktion sucht nach dem Zielzustand für einen gegebenen Zustand und ein Symbol
  * @param node
  * @param symbol
  * @param edges
  * @returns {*|null}
  */
 export function findTargetState(node, symbol, edges) {
-    // Diese Funktion sucht nach dem Zielzustand für einen gegebenen Knoten und ein Symbol
+
     const edge = edges.find(edge => {
         const symbols = edge.label.split(/[ ,]+/);
         return edge.source === node.id && symbols.includes(symbol);
@@ -33,7 +32,7 @@ export function findTargetState(node, symbol, edges) {
  */
 
 export function findPartitionForState(target, partitions) {
-    // Diese Funktion findet die Partition, zu der ein Zustand gehört
+    // Diese Funktion findet die Klasse der Partition, zu der der Zustand gehört
     for (const partition of partitions) {
         if (partition.some(node => node.id === target)) {
             return partition;
@@ -44,7 +43,7 @@ export function findPartitionForState(target, partitions) {
 
 
 /**
- * Hier findet die eigentliche Logik der Partitionstabelle statt
+ * Hier findet die eigentliche Logik der Minimierung und Aufspaltung der Klasse statt
  * @param nodes
  * @param edges
  * @param alphabet
@@ -71,10 +70,10 @@ function refinePartitions(partitions, edges, alphabet) {
                 // Finde die Partition, zu der der Zielzustand gehört
                 const targetPartition = target ? findPartitionForState(target, currentPartitions) : null;
 
-                // Key für als Zielzustand und die Partition, Müllzustände sind wichtig und bekommen eigenen Key
+                // Key für Zielzustand und die Partition, Müllzustände sind wichtig und bekommen eigenen Key
                 let key = targetPartition ? currentPartitions.indexOf(targetPartition).toString() : 'none';
 
-                // Gruppiere Knoten basierend auf ihrem Zielzustand
+                // Gruppiere Knoten basierend auf ihrer Klasse des Zielzustands
                 if (!partitionMap.has(key)) {
                     partitionMap.set(key, []);
                 }
@@ -98,7 +97,7 @@ function refinePartitions(partitions, edges, alphabet) {
                 }
             });
 
-            // Überprüfen, ob die aktuelle Partition aufgeteilt wurde
+            // Überprüfen, ob die aktuelle Partition aufgeteilt wurde, dann iteriere nochmal
             if (partitionMap.size > 1) {
                 changed = true;
             }
@@ -111,7 +110,7 @@ function refinePartitions(partitions, edges, alphabet) {
         currentPartitions = newPartitions;
     });
 
-    // Gebe die neuen Partitionen und die History zurück
+    // Gebe die neuen Partitionen und das Protokoll zurück
     return { newPartitions: currentPartitions, history };
 }
 
@@ -119,14 +118,14 @@ function refinePartitions(partitions, edges, alphabet) {
 
 const Partitioner = ({ isDfaResult, nodes, edges, alphabet, partitions, setPartitions, triggerCalculation, setTriggerCalculation, setPartitionsHistory, partitionHistory, setIsDFAMinimized }) => {
     const handleCalculateClick = () => {
-        setTriggerCalculation(true); // löst den Trigger für die Berechnung
+        setTriggerCalculation(true); // löst den Trigger für die Berechnung aus
     };
 
     useEffect(() => {
         if (triggerCalculation && isDfaResult) {
             const refineAllPartitions = async () => {
                 let currentPartitions = partitions; // Start mit den initialen Partitionen
-                let history = [{ symbol: 'Start', partitions: partitions, changed: false }]; // Initialer History-Eintrag
+                let history = [{ symbol: 'Start', partitions: partitions, changed: false }]; // Initialer Protokoll-Eintrag
 
                 let changed;
                 do {
