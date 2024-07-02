@@ -23,4 +23,4 @@ The build is minified and the filenames include the hashes.\
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 
-### Dont steal this code without appraisal.
+### Please steal this code without appraisal.
