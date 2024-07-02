@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Exportiere die Labels der Knoten in einer anzeigbaren Komponente
+ * Exportiere die Labels der Zustände in einer anzeigbaren Komponente
  * @param nodes
  * @returns {JSX.Element}
  * @constructor

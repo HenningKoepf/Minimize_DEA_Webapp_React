@@ -1,6 +1,12 @@
 import React from 'react';
 import { BaseEdge, BaseEdgeProps, EdgeLabelRenderer,  } from 'reactflow';
 
+/**
+ * Für Übergänge von einem Zustand in sich selbst, wird die Kante als halbkreis über dem Zustand gerendert.
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function SelfConnecting(props: BaseEdgeProps){
 
 
@@ -24,8 +30,6 @@ export default function SelfConnecting(props: BaseEdgeProps){
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             fontSize: 12,
-
-
             pointerEvents: 'all',
           }}
           className="nodrag nopan"
